@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 import GMRScripts.organisation_functions as org
 from shutil import copy
 
@@ -83,6 +84,74 @@ def PlotCorrectedImage(file_name,
     file, img_no = Filename(file_name).split('_')
 
     img = np.genfromtxt(file_name, delimiter='\t')
+
+    norm_img = (img / norm_power[int(img_no)])
+    norm_img *= 1e3  # increase precision for saving as int
+
+    img_vmax = np.mean(img) + (1 * np.std(img))
+    img_vmin = np.mean(img) - (1 * np.std(img))
+    norm_img_vmax = np.mean(norm_img) + (1 * np.std(norm_img))
+    norm_img_vmin = np.mean(norm_img) - (1 * np.std(norm_img))
+
+    if save_out:
+        org.ArraySave((img / norm_power[0]).astype('int16'),
+                      out_name,
+                      corrected_img_dir)
+
+    fig, (ax1, ax2) = plt.subplots(2, 1)
+
+    ax1.imshow(img,
+               cmap=plt.cm.cool,
+               origin='lower',
+               vmax=img_vmax,
+               vmin=img_vmin,
+               aspect='equal')
+    ax1.set_title(f'Image {img_no}', fontsize=16)
+
+    ax2.imshow(norm_img,
+               cmap=plt.cm.hot,
+               origin='lower',
+               vmax=norm_img_vmax,
+               vmin=norm_img_vmin,
+               aspect='equal')
+    ax2.set_title(f'Normalised Image {img_no}', fontsize=16)
+
+    fig.tight_layout()
+
+    if plot_show:
+        plt.show()
+
+    if plot_save:
+        plt.savefig(f'{out_name}.png')
+        org.CheckDirExists(corrected_img_dir_pngs)
+        copy(f'corrected_{file}.png',
+             corrected_img_dir_pngs)
+        os.remove(f'corrected_{file}.png')
+
+    fig.clf()
+    plt.close(fig)
+
+
+def PlotCorrectedImagePanda(file_name,
+                            out_name,
+                            img_dir,
+                            norm_power,
+                            save_out=False,
+                            plot_save=False,
+                            plot_show=False):
+    '''
+    Plot a raw image and corrected image (calculate brightness
+    values from pixels mean/std) save corrected image out.  Read
+    data in using Pandas
+    '''
+    corrected_img_dir = os.path.join(img_dir, 'corrected_imgs')
+    corrected_img_dir_pngs = os.path.join(img_dir, 'corrected_imgs_pngs')
+
+    file, img_no = Filename(file_name).split('_')
+
+    img = pd.read_csv(file_name, sep='\t')
+
+    img = img.values
 
     norm_img = (img / norm_power[int(img_no)])
     norm_img *= 1e3  # increase precision for saving as int
