@@ -1,0 +1,5 @@
+.vscode
+venv
+GMRX
+__pycache__
+.DS_Store
