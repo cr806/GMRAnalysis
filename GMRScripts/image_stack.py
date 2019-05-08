@@ -29,9 +29,9 @@ def RowStack(dir_name,
              row,
              pixel_stack_dir_pngs,
              pixel_stack_dir,
-             saveout=False,
-             show=False,
-             save=False):
+             saveout=True,
+             showFig=False,
+             saveFig=False):
     '''
     Stacks the corrected image files as a row group and plots wavelength
     against column on a colour plot with the colour representing the
@@ -41,6 +41,8 @@ def RowStack(dir_name,
         dir_name: string directory name containing corrected image files
         file_string: string to search for corrected image files
         row: row number within pixels (can be iterated over)
+        pixel_stack_dir_pngs: string directory for pixel figures
+        pixel_stack_dir: string directory for pixel arrays
         saveout: bool saves numpy array and moves to pixel_stack_dir
                  directory
         show: bool show colour plot
@@ -59,10 +61,10 @@ def RowStack(dir_name,
     ax.pcolormesh(row_stack,)
     ax.set_title(f'Row {row}', fontsize=18)
 
-    if show:
+    if showFig:
         plt.show()
 
-    if save:
+    if saveFig:
         plt.savefig(f'row_{row}.png')
         org.CheckDirExists(pixel_stack_dir_pngs)
         copy(f'row_{row}.png', pixel_stack_dir_pngs)
@@ -73,5 +75,5 @@ def RowStack(dir_name,
 
     if saveout:
         org.ArraySave(array_name=row_stack,
-                      file_name=f'row_{row}'',
+                      file_name=f'row_{row}',
                       dir_name=pixel_stack_dir)

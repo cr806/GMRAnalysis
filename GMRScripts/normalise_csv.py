@@ -71,7 +71,7 @@ def PlotCorrectedImage(file_name,
                        out_name,
                        img_dir,
                        norm_power,
-                       save_out=False,
+                       save_out=True,
                        plot_save=False,
                        plot_show=False):
     '''
@@ -124,9 +124,8 @@ def PlotCorrectedImage(file_name,
     if plot_save:
         plt.savefig(f'{out_name}.png')
         org.CheckDirExists(corrected_img_dir_pngs)
-        copy(f'corrected_{file}.png',
-             corrected_img_dir_pngs)
-        os.remove(f'corrected_{file}.png')
+        copy(f'{out_name}.png', corrected_img_dir_pngs)
+        os.remove(f'{out_name}.png')
 
     fig.clf()
     plt.close(fig)
@@ -136,7 +135,7 @@ def PlotCorrectedImagePanda(file_name,
                             out_name,
                             img_dir,
                             norm_power,
-                            save_out=False,
+                            save_out=True,
                             plot_save=False,
                             plot_show=False):
     '''
@@ -192,9 +191,9 @@ def PlotCorrectedImagePanda(file_name,
     if plot_save:
         plt.savefig(f'{out_name}.png')
         org.CheckDirExists(corrected_img_dir_pngs)
-        copy(f'corrected_{file}.png',
+        copy(f'corrected_{out_name}.png',
              corrected_img_dir_pngs)
-        os.remove(f'corrected_{file}.png')
+        os.remove(f'corrected_{out_name}.png')
 
     fig.clf()
     plt.close(fig)

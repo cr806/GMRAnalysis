@@ -12,8 +12,8 @@ def ReadInSettings(dir_name):
     Returns:
         an array containing each line of the experiment settings document
     '''
-    with open(os.path.join(dir_name, 'experiment_settings.txt', 'r')) as exp_settings:
-        lines = exp_settings.readlines()
+    with open(os.path.join(dir_name, 'experiment_settings.txt'), 'r') as exp:
+        lines = exp.readlines()
 
     my_settings = []
     for line in lines:
