@@ -75,7 +75,7 @@ def ArraySave(array_name, file_name, dir_name):
     '''
     CheckDirExists(dir_name)
 
-    file_name = file_name + '.npy'
+    file_name = f'{file_name}.npy'
     np.save(file_name, array_name)
     copy(file_name, dir_name)
     os.remove(file_name)
@@ -110,9 +110,7 @@ def UpdateProgress(progress):
 
     block = int(round(barLength * progress))
     progress_str = '#' * block + '-' * (barLength - block)
-    text = '\rPercent: [{0}] {1:.0f}% {2}'.format(progress_str,
-                                                  progress * 100,
-                                                  status)
+    text = f'\rPercent: [{progress_str}] {(progress * 100):.0f}% {status}'
     sys.stdout.write(text)
     sys.stdout.flush()
 

@@ -137,10 +137,10 @@ def PlotIntensity(wavs,
         plt.show()
 
     if save:
-        plt.savefig(file_name + '.png')
+        plt.savefig(f'{file_name}.png')
         org.CheckDirExists(pixel_stack_dir_pngs)
-        copy(file_name + '.png', pixel_stack_dir_pngs)
-        os.remove(file_name + '.png')
+        copy(f'{file_name}.png', pixel_stack_dir_pngs)
+        os.remove(f'{file_name}.png')
 
     fig.clf()
     plt.close(fig)

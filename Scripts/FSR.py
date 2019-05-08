@@ -27,7 +27,7 @@ ncsv.PlotDouble(wl, power, norm_power, show=False)
 for index, file in enumerate(data_files):
     file_name = os.path.join(img_dir, file)
     ncsv.PlotCorrectedImage(file_name,
-                            'corrected_' + file[0:-4],
+                            f'corrected_{file[0:-4]}',
                             img_dir,
                             norm_power,
                             save_out=True,
@@ -60,7 +60,7 @@ average_n = []
 wavs = fsr.WavSpace(exp.FindWavSettings(img_dir))
 for a in range(num_cols):
     wav_int = row_stack[:, a]
-    file_name = 'Col' + str(a) + '_Row' + str(index)
+    file_name = f'Col{a}_Row{index}'
 
     freq, freq_int = fsr.GenParams(wavs, wav_int)
     fsr.PlotIntensity(wavs,
@@ -84,7 +84,7 @@ for a in range(num_cols):
                                    frequency=True)
     average_n.append(fsr.AverageRefIndex(wav_n, freq_n))
 
-out_file = (img_dir.split('/')[-1]) + '_refractive_index'
+out_file = f'{img_dir.split("/")[-1]}_refractive_index'
 fsr.WriteFile(outfile_name=out_file, array_name=average_n)
 
 org.UpdateProgress((index + 1) / len(data_files2))

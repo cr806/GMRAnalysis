@@ -20,7 +20,7 @@ ncsv.PlotDouble(wl, power, norm_power, show=False)
 for index, file in enumerate(data_files):
     file_name = os.path.join(img_dir, file)
     ncsv.PlotCorrectedImage(file_name,
-                            'corrected_' + file[0:-4],
+                            f'corrected_{file[0:-4]}',
                             save_out=True,
                             plot_show=False,
                             plot_save=False)

@@ -37,6 +37,7 @@ def PixelStack(wavelength_settings, show=False):
             if show:
                 plt.show()
 
+
 if __name__ == '__main__':
     # main_dir is equivalent to root, then all directories defined here
     main_dir = Platform()
