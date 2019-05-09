@@ -57,23 +57,24 @@ def RowStack(dir_name,
         file = np.load(os.path.join(dir_name, selected_file))
         row_stack.append(file[row][:])
 
-    fig, ax = plt.subplots(1, 1)
-    ax.pcolormesh(row_stack,)
-    ax.set_title(f'Row {row}', fontsize=18)
-
-    if showFig:
-        plt.show()
-
-    if saveFig:
-        plt.savefig(f'row_{row}.png')
-        org.CheckDirExists(pixel_stack_dir_pngs)
-        copy(f'row_{row}.png', pixel_stack_dir_pngs)
-        os.remove(f'row_{row}.png')
-
-    fig.clf()
-    plt.close(fig)
-
     if saveout:
         org.ArraySave(array_name=row_stack,
                       file_name=f'row_{row}',
                       dir_name=pixel_stack_dir)
+
+    if showFig or saveFig:
+        fig, ax = plt.subplots(1, 1)
+        ax.pcolormesh(row_stack,)
+        ax.set_title(f'Row {row}', fontsize=18)
+
+        if showFig:
+            plt.show()
+
+        if saveFig:
+            plt.savefig(f'row_{row}.png')
+            org.CheckDirExists(pixel_stack_dir_pngs)
+            copy(f'row_{row}.png', pixel_stack_dir_pngs)
+            os.remove(f'row_{row}.png')
+
+        fig.clf()
+        plt.close(fig)

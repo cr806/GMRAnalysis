@@ -15,14 +15,15 @@ def WavSpace(wavelength_settings):
     Args:
         wavelength_settings: <list> 1D array containing wavelength settings
     '''
-    wav_i = wavelength_settings[0][0:-2]
-    wav_f = wavelength_settings[1][0:-2]
-    wav_step = wavelength_settings[2][0:-2]
+    wav_i = wavelength_settings['wav_i']
+    wav_f = wavelength_settings['wav_f']
+    wav_step = wavelength_settings['wav_s']
 
-    wav_difference = float(wav_f) - float(wav_i)
-    wav_fraction = float(wav_difference) / float(wav_step)
+    wav_difference = wav_f - wav_i
+    wav_fraction = wav_difference / wav_step
     number_files = int(wav_fraction + 1)
-    wavs = np.linspace(float(wav_i), float(wav_f), number_files)
+    wavs = np.linspace(wav_i, wav_f, number_files)
+
     return wavs
 
 
@@ -115,35 +116,36 @@ def PlotIntensity(wavs,
         show: <bool> Show the graph plot
         save: <bool> Save the graph plot
     '''
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=[10, 7])
+    if show or save:
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=[10, 7])
 
-    ax1.plot(wavs, wav_int, 'b', lw=2, label=file_name)
-    ax1.grid(True)
-    ax1.legend(frameon=True, loc=0, ncol=1, prop={'size': 10})
-    ax1.set_xlabel("Wavelength [nm]", fontsize=18)
-    ax1.set_ylabel("Intensity [au]", fontsize=18)
-    ax1.set_title("Intensity As Function Of Wavelength", fontsize=20)
+        ax1.plot(wavs, wav_int, 'b', lw=2, label=file_name)
+        ax1.grid(True)
+        ax1.legend(frameon=True, loc=0, ncol=1, prop={'size': 10})
+        ax1.set_xlabel("Wavelength [nm]", fontsize=18)
+        ax1.set_ylabel("Intensity [au]", fontsize=18)
+        ax1.set_title("Intensity As Function Of Wavelength", fontsize=20)
 
-    ax2.plot(freq, freq_int, 'r', lw=2, label=file_name)
-    ax2.grid(True)
-    ax2.legend(frameon=True, loc=0, ncol=1, prop={'size': 10})
-    ax2.set_xlabel("Frequency [Hz]", fontsize=18)
-    ax2.set_ylabel("Intensity [au]", fontsize=18)
-    ax2.set_title("Intensity As Function Of Frequency", fontsize=20)
+        ax2.plot(freq, freq_int, 'r', lw=2, label=file_name)
+        ax2.grid(True)
+        ax2.legend(frameon=True, loc=0, ncol=1, prop={'size': 10})
+        ax2.set_xlabel("Frequency [Hz]", fontsize=18)
+        ax2.set_ylabel("Intensity [au]", fontsize=18)
+        ax2.set_title("Intensity As Function Of Frequency", fontsize=20)
 
-    fig.tight_layout()
+        fig.tight_layout()
 
-    if show:
-        plt.show()
+        if show:
+            plt.show()
 
-    if save:
-        plt.savefig(f'{file_name}.png')
-        org.CheckDirExists(pixel_stack_dir_pngs)
-        copy(f'{file_name}.png', pixel_stack_dir_pngs)
-        os.remove(f'{file_name}.png')
+        if save:
+            plt.savefig(f'{file_name}.png')
+            org.CheckDirExists(pixel_stack_dir_pngs)
+            copy(f'{file_name}.png', pixel_stack_dir_pngs)
+            os.remove(f'{file_name}.png')
 
-    fig.clf()
-    plt.close(fig)
+        fig.clf()
+        plt.close(fig)
 
 
 def FindPeaks(x, y):
@@ -191,12 +193,12 @@ def FreeSpectralRange(x, thickness, theta, wavelength=False, frequency=False):
             n_array.append((((lambda_0 * lambda_0) /
                              (delta[b] * nm)) - lambda_0) /
                            (2 * L * costheta))
+        return n_array
 
     if frequency:
         for b in range(len(delta)):
             n_array.append(C / (2 * delta[b] * L * costheta))
-
-    return n_array
+        return n_array
 
 
 def AverageRefIndex(wav_n, freq_n):
@@ -209,13 +211,18 @@ def AverageRefIndex(wav_n, freq_n):
         freq_n: <list> Array containing all values of refractive index
                 calculated from the frequency space
     '''
-    average_wavelength_n = sum(wav_n) / len(wav_n)
-    average_frequency_n = sum(freq_n) / len(freq_n)
-    average_n = (average_wavelength_n + average_frequency_n) / 2
+    average_n = 0
+    if wav_n:
+        average_n += (sum(wav_n) / len(wav_n))
+    if freq_n:
+        average_n += (sum(freq_n) / len(freq_n))
+    if wav_n and freq_n:
+        average_n = average_n / 2
+
     return average_n
 
 
-def WriteFile(outfile_name, array_name):
+def WriteRowToFile(outfile_name, array_name):
     '''
     Writes an array (array_name) to a csv file as a single row within that
     file (outfile_name), can be iterated over. CSV file is tab delimited.
@@ -224,5 +231,5 @@ def WriteFile(outfile_name, array_name):
         array_name: <str> Name of array to write to each row
     '''
     with open(outfile_name, 'a', newline='') as outfile:
-        writer = csv.writer(outfile, delimiter='\t')
+        writer = csv.writer(outfile, delimiter=',')
         writer.writerow([array_name])

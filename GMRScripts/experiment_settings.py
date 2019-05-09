@@ -1,5 +1,4 @@
 import os
-import GMRScripts.organisation_functions as org
 
 
 def ReadInSettings(dir_name):
@@ -12,15 +11,39 @@ def ReadInSettings(dir_name):
     Returns:
         an array containing each line of the experiment settings document
     '''
+
+    exp_settings = {
+        'int_time': 0.0,
+        'slit': 0.0,
+        'wav_i': 0.0,
+        'wav_f': 0.0,
+        'wav_s': 0.0,
+        'time_s': 0,
+        'filenames': []
+    }
+
     with open(os.path.join(dir_name, 'experiment_settings.txt'), 'r') as exp:
         lines = exp.readlines()
 
-    my_settings = []
     for line in lines:
-        my_settings.append(line)
-        print(line)
+        if not line.strip():
+            continue
+        if 'integration time' in line.lower():
+            exp_settings['int_time'] = float(line.split(':')[1].strip())
+        if 'slit widths' in line.lower():
+            exp_settings['slit'] = int(line.split(':')[1].strip())
+        if 'initial wavelength' in line.lower():
+            exp_settings['wav_i'] = float(line.split(':')[1].strip())
+        if 'final wavelength' in line.lower():
+            exp_settings['wav_f'] = float(line.split(':')[1].strip())
+        if 'wavelength step' in line.lower():
+            exp_settings['wav_s'] = float(line.split(':')[1].strip())
+        if 'time step' in line.lower():
+            exp_settings['time_s'] = int(line.split(':')[1].strip())
+        if 'hs_img_' in line.lower():
+            exp_settings['filenames'].append(line.split('\t')[0].strip())
 
-    return my_settings
+    return exp_settings
 
 
 def FindWavSettings(dir_name):
@@ -45,15 +68,9 @@ def FindWavSettings(dir_name):
 
 
 if __name__ == '__main__':
-    # main_dir is equivalent to root,
-    # then all directories defined here.
-    main_dir = org.Platform()
-    sub_dir = os.path.join(main_dir, '220319_to_120419', '100419')
-    img_dir = os.path.join(sub_dir, 'test')
-    corrected_img_dir = os.path.join(img_dir, 'corrected_imgs')
-    corrected_img_dir_pngs = os.path.join(img_dir, 'corrected_imgs_pngs')
-    pixel_stack_dir = os.path.join(img_dir, 'pixel_stack')
-    pixel_stack_dir_pngs = os.path.join(img_dir, 'pixel_stack_pngs')
+    main_dir = '/Users/chris/Documents/SoftwareDev/Python' \
+               '/GMR Analysis Project/Put_Data_Here'
 
-    exp_settings = ReadInSettings(img_dir)
-    wavelength_settings = FindWavSettings(img_dir)
+    exp_settings = ReadInSettings(main_dir)
+    print(exp_settings)
+    # wavelength_settings = FindWavSettings(img_dir)

@@ -12,8 +12,9 @@ def ReadInPwr(file_name):
     Args:
         file_name, string file path
     '''
-    step, wl, f, power = np.genfromtxt(file_name,
-                                       delimiter='\t',
+    pwr_spec = os.path.join(file_name, 'power_spectrum.csv')
+    step, wl, f, power = np.genfromtxt(pwr_spec,
+                                       delimiter=',',
                                        skip_header=1,
                                        unpack=True)
     max_element = np.amax(power)
@@ -29,30 +30,32 @@ def PlotDouble(wl, power, norm_power, show=False, save=False):
         show, bool determines if plot is shown
         save, bool determines if plot is saved
     '''
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=[10, 7])
+    if show or save:
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=[10, 7])
 
-    ax1.plot(wl, power, 'b', lw=2, label='Power Spectrum')
-    ax1.grid(True)
-    ax1.legend(frameon=True, loc=0, ncol=1, prop={'size': 10})
-    ax1.set_xlabel("Wavelength [nm]", fontsize=18)
-    ax1.set_ylabel("Power [au]", fontsize=18)
-    ax1.set_title("Power Spectrum", fontsize=20)
+        ax1.plot(wl, power, 'b', lw=2, label='Power Spectrum')
+        ax1.grid(True)
+        ax1.legend(frameon=True, loc=0, ncol=1, prop={'size': 10})
+        ax1.set_xlabel("Wavelength [nm]", fontsize=18)
+        ax1.set_ylabel("Power [au]", fontsize=18)
+        ax1.set_title("Power Spectrum", fontsize=20)
 
-    ax2.plot(wl, power/norm_power, 'r', lw=2, label='Corrected Power Spectrum')
-    ax2.grid(True)
-    ax2.legend(frameon=True, loc=0, ncol=1, prop={'size': 10})
-    ax2.set_xlabel("Wavelength [nm]", fontsize=18)
-    ax2.set_ylabel("Corrected Power [au]", fontsize=18)
-    ax2.set_title("Corrected Power Spectrum", fontsize=20)
+        ax2.plot(wl, power/norm_power, 'r', lw=2,
+                 label='Corrected Power Spectrum')
+        ax2.grid(True)
+        ax2.legend(frameon=True, loc=0, ncol=1, prop={'size': 10})
+        ax2.set_xlabel("Wavelength [nm]", fontsize=18)
+        ax2.set_ylabel("Corrected Power [au]", fontsize=18)
+        ax2.set_title("Corrected Power Spectrum", fontsize=20)
 
-    fig.tight_layout()
-    if show:
-        plt.show()
-    if save:
-        plt.savefig('Corrected_Power_Spectrum.png')
+        fig.tight_layout()
+        if show:
+            plt.show()
+        if save:
+            plt.savefig('Corrected_Power_Spectrum.png')
 
-    fig.clf()
-    plt.close(fig)
+        fig.clf()
+        plt.close(fig)
 
 
 def Filename(file_name):
@@ -102,19 +105,19 @@ def PlotCorrectedImage(file_name,
         fig, (ax1, ax2) = plt.subplots(2, 1)
 
         ax1.imshow(img,
-                cmap=plt.cm.cool,
-                origin='lower',
-                vmax=img_vmax,
-                vmin=img_vmin,
-                aspect='equal')
+                   cmap=plt.cm.cool,
+                   origin='lower',
+                   vmax=img_vmax,
+                   vmin=img_vmin,
+                   aspect='equal')
         ax1.set_title(f'Image {img_no}', fontsize=16)
 
         ax2.imshow(norm_img,
-                cmap=plt.cm.hot,
-                origin='lower',
-                vmax=norm_img_vmax,
-                vmin=norm_img_vmin,
-                aspect='equal')
+                   cmap=plt.cm.hot,
+                   origin='lower',
+                   vmax=norm_img_vmax,
+                   vmin=norm_img_vmin,
+                   aspect='equal')
         ax2.set_title(f'Normalised Image {img_no}', fontsize=16)
 
         fig.tight_layout()
@@ -149,7 +152,7 @@ def PlotCorrectedImagePanda(file_name,
 
     file, img_no = Filename(file_name).split('_')
 
-    img = pd.read_csv(file_name, sep='\t')
+    img = pd.read_csv(file_name, sep=',')
 
     img = img.values
 
