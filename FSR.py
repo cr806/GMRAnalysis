@@ -25,30 +25,35 @@ pwr_spec_filename = os.path.join(main_dir, 'power_spectrum.csv')
 step, wl, f, power, norm_power = ncsv.ReadInPwr(pwr_spec_filename)
 ncsv.PlotDouble(wl, power, norm_power, show=False)
 
-for index, file in enumerate(data_files):
-    file_name = os.path.join(img_dir, file)
-    out_file = f'corrected_{file[0:-4]}'
-    ncsv.PlotCorrectedImage(file_name,
-                            out_file,
-                            img_dir,
-                            norm_power,
-                            plot_show=False,
-                            plot_save=False)
-    org.UpdateProgress((index + 1) / len(data_files))
+if (not os.path.isdir(corrected_img_dir) or
+        len(os.listdir(corrected_img_dir)) < len(wl)):
+
+    for index, file in enumerate(data_files):
+        file_name = os.path.join(img_dir, file)
+        out_name = f'corrected_{file[0:-4]}'
+        ncsv.PlotCorrectedImagePanda(file_name,
+                                     out_name,
+                                     corrected_img_dir,
+                                     norm_power,
+                                     plot_show=False,
+                                     plot_save=True)
+        org.UpdateProgress((index + 1) / len(data_files))
 
 rows, cols = imst.FindImgSize(dir_name=corrected_img_dir,
                               file_string='corrected_img_')
 
-# POTENTIAL ISSUE, ROW_STACK IS OVERWRITTEN EVERY LOOP
-for row in range(5):  # range(rows):
-    row_stack = imst.RowStack(corrected_img_dir,
-                              'corrected_img_',
-                              row,
-                              pixel_stack_dir_pngs,
-                              pixel_stack_dir,
-                              showFig=False,
-                              saveFig=True)
-    org.UpdateProgress((row+1) / rows)
+if (not os.path.isdir(pixel_stack_dir) or
+        len(os.listdir(pixel_stack_dir)) < rows):
+
+    for row in range(rows):
+        row_stack = imst.RowStack(corrected_img_dir,
+                                  'corrected_img_',
+                                  row,
+                                  pixel_stack_dir_pngs,
+                                  pixel_stack_dir,
+                                  showFig=True,
+                                  saveFig=False)
+        org.UpdateProgress((row+1) / rows)
 
 
 data_files2 = org.ExtractFiles(dir_name=pixel_stack_dir,

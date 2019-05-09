@@ -78,8 +78,8 @@ def PlotCorrectedImage(file_name,
     Plot a raw image and corrected image (calculate brightness
     values from pixels mean/std) save corrected image out
     '''
-    corrected_img_dir = os.path.join(img_dir, 'corrected_imgs')
-    corrected_img_dir_pngs = os.path.join(img_dir, 'corrected_imgs_pngs')
+    corrected_img_dir = img_dir
+    corrected_img_dir_pngs = f'{corrected_img_dir}_pngs'
 
     file, img_no = Filename(file_name).split('_')
 
@@ -98,37 +98,38 @@ def PlotCorrectedImage(file_name,
                       out_name,
                       corrected_img_dir)
 
-    fig, (ax1, ax2) = plt.subplots(2, 1)
+    if plot_save or plot_show:
+        fig, (ax1, ax2) = plt.subplots(2, 1)
 
-    ax1.imshow(img,
-               cmap=plt.cm.cool,
-               origin='lower',
-               vmax=img_vmax,
-               vmin=img_vmin,
-               aspect='equal')
-    ax1.set_title(f'Image {img_no}', fontsize=16)
+        ax1.imshow(img,
+                cmap=plt.cm.cool,
+                origin='lower',
+                vmax=img_vmax,
+                vmin=img_vmin,
+                aspect='equal')
+        ax1.set_title(f'Image {img_no}', fontsize=16)
 
-    ax2.imshow(norm_img,
-               cmap=plt.cm.hot,
-               origin='lower',
-               vmax=norm_img_vmax,
-               vmin=norm_img_vmin,
-               aspect='equal')
-    ax2.set_title(f'Normalised Image {img_no}', fontsize=16)
+        ax2.imshow(norm_img,
+                cmap=plt.cm.hot,
+                origin='lower',
+                vmax=norm_img_vmax,
+                vmin=norm_img_vmin,
+                aspect='equal')
+        ax2.set_title(f'Normalised Image {img_no}', fontsize=16)
 
-    fig.tight_layout()
+        fig.tight_layout()
 
-    if plot_show:
-        plt.show()
+        if plot_show:
+            plt.show()
 
-    if plot_save:
-        plt.savefig(f'{out_name}.png')
-        org.CheckDirExists(corrected_img_dir_pngs)
-        copy(f'{out_name}.png', corrected_img_dir_pngs)
-        os.remove(f'{out_name}.png')
+        if plot_save:
+            plt.savefig(f'{out_name}.png')
+            org.CheckDirExists(corrected_img_dir_pngs)
+            copy(f'{out_name}.png', corrected_img_dir_pngs)
+            os.remove(f'{out_name}.png')
 
-    fig.clf()
-    plt.close(fig)
+        fig.clf()
+        plt.close(fig)
 
 
 def PlotCorrectedImagePanda(file_name,
@@ -143,8 +144,8 @@ def PlotCorrectedImagePanda(file_name,
     values from pixels mean/std) save corrected image out.  Read
     data in using Pandas
     '''
-    corrected_img_dir = os.path.join(img_dir, 'corrected_imgs')
-    corrected_img_dir_pngs = os.path.join(img_dir, 'corrected_imgs_pngs')
+    corrected_img_dir = img_dir
+    corrected_img_dir_pngs = f'{corrected_img_dir}_pngs'
 
     file, img_no = Filename(file_name).split('_')
 
@@ -165,35 +166,36 @@ def PlotCorrectedImagePanda(file_name,
                       out_name,
                       corrected_img_dir)
 
-    fig, (ax1, ax2) = plt.subplots(2, 1)
+    if plot_save or plot_show:
+        fig, (ax1, ax2) = plt.subplots(2, 1)
 
-    ax1.imshow(img,
-               cmap=plt.cm.cool,
-               origin='lower',
-               vmax=img_vmax,
-               vmin=img_vmin,
-               aspect='equal')
-    ax1.set_title(f'Image {img_no}', fontsize=16)
+        ax1.imshow(img,
+                   cmap=plt.cm.cool,
+                   origin='lower',
+                   vmax=img_vmax,
+                   vmin=img_vmin,
+                   aspect='equal')
+        ax1.set_title(f'Image {img_no}', fontsize=16)
 
-    ax2.imshow(norm_img,
-               cmap=plt.cm.hot,
-               origin='lower',
-               vmax=norm_img_vmax,
-               vmin=norm_img_vmin,
-               aspect='equal')
-    ax2.set_title(f'Normalised Image {img_no}', fontsize=16)
+        ax2.imshow(norm_img,
+                   cmap=plt.cm.hot,
+                   origin='lower',
+                   vmax=norm_img_vmax,
+                   vmin=norm_img_vmin,
+                   aspect='equal')
+        ax2.set_title(f'Normalised Image {img_no}', fontsize=16)
 
-    fig.tight_layout()
+        fig.tight_layout()
 
-    if plot_show:
-        plt.show()
+        if plot_show:
+            plt.show()
 
-    if plot_save:
-        plt.savefig(f'{out_name}.png')
-        org.CheckDirExists(corrected_img_dir_pngs)
-        copy(f'corrected_{out_name}.png',
-             corrected_img_dir_pngs)
-        os.remove(f'corrected_{out_name}.png')
+        if plot_save:
+            plt.savefig(f'{out_name}.png')
+            org.CheckDirExists(corrected_img_dir_pngs)
+            copy(f'{out_name}.png',
+                 corrected_img_dir_pngs)
+            os.remove(f'{out_name}.png')
 
-    fig.clf()
-    plt.close(fig)
+        fig.clf()
+        plt.close(fig)
