@@ -15,7 +15,7 @@ put_data_here directory.
 '''
 for directory in data_dirs:
     img_dir = os.path.join(main_dir, directory)
-    
+
     data_files = org.ExtractFiles(dir_name=img_dir, file_string='img_')
 
     step, wl, f, power, norm_power = ncsv.ReadInPwr(dir_name=img_dir)
@@ -30,6 +30,6 @@ for directory in data_dirs:
                                 norm_power,
                                 save_out=True,
                                 plot_show=False,
-                                plot_save=True)
+                                plot_save=False)
 
         org.UpdateProgress((index + 1) / len(data_files))
