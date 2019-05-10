@@ -24,11 +24,6 @@ def ConfigDirPath():
         print('Once complete please hit enter on your keyboard.')
         input('Press enter to continue...\n')
         #os.sys.exit(0)
-        '''
-        By adding the os.sys.exit(0) line here the code stops when the
-        directory is created but not when there is data present. Keep the
-        input command? Stops the code from running until there is data present.
-        '''
     else:
         print('Data present in "Put_Data_Here", ensure it is correct\n')
         input('Press enter to continue...\n')
