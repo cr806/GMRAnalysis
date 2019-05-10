@@ -4,15 +4,8 @@ import GMRScripts.normalise_csv as ncsv
 import GMRScripts.config_dirpath as con
 
 main_dir = con.ConfigDirPath()
-'''
-Platform is kind of an irrelevant function now if we want to just have
-a directory where users 'dump' their data.
-'''
 data_dirs = os.listdir(main_dir)
-'''
-This allows for users to place data directories from GMRX in to the
-put_data_here directory.
-'''
+
 for directory in data_dirs:
     img_dir = os.path.join(main_dir, directory)
 
