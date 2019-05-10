@@ -5,34 +5,6 @@ import numpy as np
 from shutil import copy
 
 
-def Platform():
-    '''
-    Determines the directory path based on which operating system the user is
-    using. This is only relevant if you use two different operating systems.
-    Returns main directory as a path.
-    Args:
-        No required args but does require user input to determine the directory
-        path you wish to use.
-    '''
-    if platform.system() == 'Windows':
-        os.system('cls')
-        main_dir = os.path.join('C:/'
-                                'Users',
-                                'joshs',
-                                'Documents',
-                                'Masters_Project')
-
-    if platform.system() == 'Linux' or platform.system() == 'Darwin':
-        os.system('clear')
-        main_dir = os.path.join('media',
-                                'mass_storage',
-                                'josh',
-                                'Documents',
-                                'Masters_Project')
-
-    return main_dir
-
-
 def FileSort(dir_name):
     '''
     Numerically sort a directory containing a combination of string file names
