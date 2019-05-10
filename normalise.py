@@ -1,28 +1,40 @@
 import os
-import GMRScripts.organisation_functions as org
+import GMR.InputOutput as io
 import GMRScripts.normalise_csv as ncsv
-import GMRScripts.config_dirpath as con
+import time
 
-main_dir = con.ConfigDirPath()
-data_dirs = os.listdir(main_dir)
+main_dir = io.exp_in()
+hs_imgs = os.listdir(main_dir)
 
-for directory in data_dirs:
-    img_dir = os.path.join(main_dir, directory)
+for hs_img in hs_imgs:
+    img_dir = os.path.join(main_dir, hs_img)
 
-    data_files = org.ExtractFiles(dir_name=img_dir, file_string='img_')
+    if not os.path.isdir(img_dir):
+        continue
 
-    step, wl, f, power, norm_power = ncsv.ReadInPwr(dir_name=img_dir)
+    data_files = io.extract_files(dir_name=img_dir,
+                                  file_string='img_')
 
-    ncsv.PlotDouble(wl, power, norm_power, show=False)
+    for file in data_files:
+        file_path = os.path.join(img_dir, file)
+        img, file_name = io.raw_in(file_path)
+        print(img)
+        time.sleep(5)
+        print(file_name)
 
-    for index, file in enumerate(data_files):
-        file_name = os.path.join(img_dir, file)
-        ncsv.PlotCorrectedImage(file_name,
-                                f'corrected_{file[0:-4]}',
-                                img_dir,
-                                norm_power,
-                                save_out=True,
-                                plot_show=False,
-                                plot_save=False)
+#data_files = org.ExtractFiles(dir_name=img_dir, file_string='img_')
+#in_file = os.path.join(img_dir, 'power_spectrum.csv')
 
-        org.UpdateProgress((index + 1) / len(data_files))
+#step, wl, f, power, norm_power = ncsv.ReadInPwr(in_file)
+
+#ncsv.PlotDouble(wl, power, norm_power, show=False)
+
+#for index, file in enumerate(data_files):
+#    file_name = os.path.join(img_dir, file)
+#    ncsv.PlotCorrectedImage(file_name,
+#                            f'corrected_{file[0:-4]}',
+#                            save_out=True,
+#                            plot_show=False,
+#                            plot_save=False)
+#
+#    org.UpdateProgress((index + 1) / len(data_files))
