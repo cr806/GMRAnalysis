@@ -1,40 +1,44 @@
 import os
+import GMR.ConfigureSettings as cs
 import GMR.InputOutput as io
+import GMR.DataPreparation as dp
 import GMRScripts.normalise_csv as ncsv
 import time
 
-main_dir = io.exp_in()
-hs_imgs = os.listdir(main_dir)
+main_dir = cs.config_dir_path()
 
-for hs_img in hs_imgs:
+exp_settings = io.exp_in(main_dir)
+print('Experiment Settings:\n' + f'{exp_settings}' + '\n')
+
+step, wl, f, power, norm_power = dp.pwr_norm(dir_name=main_dir,
+                                             plot_show=False,
+                                             plot_save=True)
+
+for hs_img in exp_settings['hs_imgs']:
     img_dir = os.path.join(main_dir, hs_img)
-
     if not os.path.isdir(img_dir):
         continue
+
+    cs.create_all_dirs(dir_name=img_dir)
 
     data_files = io.extract_files(dir_name=img_dir,
                                   file_string='img_')
 
-    for file in data_files:
+    print('\nNormalising csvs...')
+    for index, file in enumerate(data_files):
         file_path = os.path.join(img_dir, file)
-        img, file_name = io.raw_in(file_path)
-        print(img)
-        time.sleep(5)
-        print(file_name)
+        img, file_name = io.raw_in(file_path=file_path)
 
-#data_files = org.ExtractFiles(dir_name=img_dir, file_string='img_')
-#in_file = os.path.join(img_dir, 'power_spectrum.csv')
+        norm_img = dp.bg_norm(image=img,
+                              file_name=file_name,
+                              norm_power=norm_power,
+                              dir_name=img_dir,
+                              plot_show=False,
+                              plot_save=False)
 
-#step, wl, f, power, norm_power = ncsv.ReadInPwr(in_file)
+        io.data_array_out(array_name=norm_img,
+                          file_name=f'corrected_{file_name}',
+                          dir_name=os.path.join(img_dir,
+                                                'corrected_imgs'))
 
-#ncsv.PlotDouble(wl, power, norm_power, show=False)
-
-#for index, file in enumerate(data_files):
-#    file_name = os.path.join(img_dir, file)
-#    ncsv.PlotCorrectedImage(file_name,
-#                            f'corrected_{file[0:-4]}',
-#                            save_out=True,
-#                            plot_show=False,
-#                            plot_save=False)
-#
-#    org.UpdateProgress((index + 1) / len(data_files))
+        cs.update_progress(index / len(data_files))
