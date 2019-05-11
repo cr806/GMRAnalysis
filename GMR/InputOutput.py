@@ -2,58 +2,52 @@ import os
 import numpy as np
 from shutil import copy
 import pandas as pd
+import GMR.ConfigureSettings as cs
 
 
-def check_dir_exists(dir_name):
+def exp_in(dir_name):
     '''
-    Check to see if a directory path exists, if not create one.
+    Reads in the experiment settings file outputted from GMRX setup detailing
+    the number of images, integration time, initial/final wavelength and step,
+    time step and image numbers.
     Args:
-        dir_name: <string> directory path
+        dir_name: <string> directory containing experiment settings document
+    Returns:
+        an array containing each line of the experiment settings document
     '''
-    if os.path.isdir(dir_name) is False:
-        os.mkdir(dir_name)
 
+    exp_settings = {
+        'int_time' : 0.0,
+        'slit' : 0.0,
+        'wav_i' : 0.0,
+        'wav_f' : 0.0,
+        'wav_s' : 0.0,
+        'time_s' : 0,
+        'hs_imgs': []
+    }
 
-def exp_in():
-    '''
-    Asigns directory path for all data, allowing user input without
-    code file path alterations.
-    The current working directory (cwd) will then contain all data to
-    be analysed. A directory is created name "Put_Data_Here".
-    The function waits for user to place data in the folder e.g.
-    "hs_img_000", "power_spectrum.csv", "experimental_settings.txt"
-    from GMR X.
-    Once data is present, the function returns the "Put_Data_Here"
-    directory as the main directory and then directory paths can be
-    asigned.
-    Args:
-        The function requires no arguments but will not work unless data
-        is present in the new (created) directory and awaits user input.
-    '''
-    root = os.getcwd()
-    main_dir = os.path.join(root, 'Put_Data_Here')
-    check_dir_exists(main_dir)
+    with open(os.path.join(dir_name, 'experiment_settings.txt'), 'r') as exp:
+        lines = exp.readlines()
 
-    while len(os.listdir(main_dir)) == 0:
-        print('Place data into "Put_Data_Here" folder with this code')
-        print('Once complete, restart code')
-        os.sys.exit(0)
+    for line in lines:
+        if not line.strip():
+            continue
+        if 'integration time' in line.lower():
+            exp_settings['int_time'] = float(line.split(':')[1].strip())
+        if 'slit widths' in line.lower():
+            exp_settings['slit'] = int(line.split(':')[1].strip())
+        if 'initial wavelength' in line.lower():
+            exp_settings['wav_i'] = float(line.split(':')[1].strip())
+        if 'final wavelength' in line.lower():
+            exp_settings['wav_f'] = float(line.split(':')[1].strip())
+        if 'wavelength step' in line.lower():
+            exp_settings['wav_s'] = float(line.split(':')[1].strip())
+        #if 'time step' in line.lower():
+        #    exp_settings['time_s'] = int(line.split(':')[1].strip())
+        if 'hs_img_' in line.lower():
+            exp_settings['hs_imgs'].append(line.split('\t')[0].strip())
 
-    else:
-        print('Data present in "Put_Data_Here", ensure it is correct\n')
-        input('Press enter to continue...\n')
-
-    print('Data set(s) to be examined:')
-    print(os.listdir(main_dir))
-    print('\n')
-    return main_dir
-
-
-def create_all_dirs(dir_name):
-    '''
-    '''
-    create_dir = ['corrected_imgs']
-    
+    return exp_settings
 
 
 def file_sort(dir_name):
@@ -77,7 +71,7 @@ def extract_files(dir_name, file_string):
     return [a for a in dir_list if file_string in a]
 
 
-def filename(file_path):
+def get_filename(file_path):
     '''
     Takes a file name path and splits on '/' to obtain only the file name.
     Splits the file name from extension and returns just the user asigned
@@ -85,7 +79,7 @@ def filename(file_path):
     Args:
         file_name: <string> path to file
     '''
-    return os.path.splitext(os.path.basename(file_name))[0]
+    return os.path.splitext(os.path.basename(file_path))[0]
 
 
 def raw_in(file_path):
@@ -97,8 +91,8 @@ def raw_in(file_path):
     Args:
         file_name: <string> file path
     '''
-    file_name = filename(file_path)
-    img = pd.read_csv(file_name, sep='\t')
+    file_name = get_filename(file_path)
+    img = pd.read_csv(file_path, sep='\t')
     img = img.values
     return img, file_name
 
@@ -115,9 +109,9 @@ def data_array_out(array_name, file_name, dir_name):
         file_name: <string> file name to save out
         dir_name: <string> directory name to copy saved array to
     '''
-    check_dir_exists(dir_name)
+    cs.check_dir_exists(dir_name)
 
-    file_name = f'(file_name).npy'
+    file_name = f'{file_name}.npy'
     np.save(file_name, array_name)
     copy(file_name, dir_name)
     os.remove(file_name)
@@ -133,17 +127,3 @@ def csv_out():
 
 def user_in():
     pass
-
-
-if __name__ == '__main__':
-    main_dir = exp_in()
-    hs_imgs = os.listdir(main_dir)
-
-    for hs_img in hs_imgs:
-        img_dir = os.path.join(main_dir, hs_img)
-
-        if not os.path.isdir(img_dir):
-            continue
-
-        print(img_dir)
-        print(os.listdir(img_dir))
