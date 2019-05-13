@@ -1,7 +1,6 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from shutil import copy
 
 def pwr_norm(image_data, file_name, norm_power, dir_name):
     '''
