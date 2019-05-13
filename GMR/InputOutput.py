@@ -1,5 +1,6 @@
 import os
 import sys
+import json
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -67,6 +68,43 @@ def check_dir_exists(dir_name):
         os.mkdir(dir_name)
 
 
+def exp_in_json(dir_name):
+    '''
+    Reads in the experiment settings file outputted from GMRX setup detailing
+    the number of images, integration time, initial/final wavelength and step,
+    time step and image numbers.
+    Args:
+        dir_name: <string> directory containing experiment settings document
+    Returns:
+        a dictionary containing each setting
+    Example JSON:
+        {
+            "hs_images": 1,
+            "integration_time": 500.0,
+            "slit_widths": 1000,
+            "initial_wavelength": 700.0,
+            "final_wavelength": 800.0,
+            "wavelength_step": 0.5,
+            "time_step": 0,
+            "files": [
+                {
+                    "filename": "hs_img_000",
+                    "date": "29/04/2019",
+                    "time": "11:48:57"
+                },
+                {
+                    "filename": "hs_img_001",
+                    "date": "29/04/2019",
+                    "time": "11:50:24"
+                }
+            ]
+        }
+    '''
+    filename = os.path.join(dir_name, 'experiment_settings.config')
+    with open(filename, 'r') as f:
+        return json.load(f)
+
+
 def exp_in(dir_name):
     '''
     Reads in the experiment settings file outputted from GMRX setup detailing
@@ -75,7 +113,7 @@ def exp_in(dir_name):
     Args:
         dir_name: <string> directory containing experiment settings document
     Returns:
-        an array containing each line of the experiment settings document
+        a dictionary containing each setting
     '''
 
     exp_settings = {
@@ -88,7 +126,8 @@ def exp_in(dir_name):
         'hs_imgs': []
     }
 
-    with open(os.path.join(dir_name, 'experiment_settings.txt'), 'r') as exp:
+    filename = os.path.join(dir_name, 'experiment_settings.txt')
+    with open(filename, 'r') as exp:
         lines = exp.readlines()
 
     for line in lines:
