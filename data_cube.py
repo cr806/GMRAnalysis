@@ -3,6 +3,7 @@ import GMR.InputOutput as io
 
 main_dir = io.config_dir_path()
 
+
 exp_settings = io.exp_in(main_dir)
 print('Experiment Settings:\n' + f'{exp_settings}' + '\n')
 

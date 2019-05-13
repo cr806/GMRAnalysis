@@ -46,6 +46,7 @@ for hs_img in exp_settings['hs_imgs']:
                    out_name=f'corrected_{file_name}.png',
                    plot_show=False)
 
+
         io.array_out(array_name=norm_img,
                      file_name=f'corrected_{file_name}',
                      dir_name=os.path.join(img_dir,
