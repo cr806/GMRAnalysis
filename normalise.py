@@ -32,8 +32,7 @@ for hs_img in exp_settings['hs_imgs']:
                    dir_name=img_dir,
                    image_title=f'Image: {img_no}',
                    out_name=f'{file_name}.png',
-                   plot_show=False,
-                   plot_save=True)
+                   plot_show=False)
 
         norm_img = dp.pwr_norm(image_data=img,
                                file_name=file_name,
@@ -45,8 +44,7 @@ for hs_img in exp_settings['hs_imgs']:
                    dir_name=img_dir,
                    image_title=f'Normalised image: {img_no}',
                    out_name=f'corrected_{file_name}.png',
-                   plot_show=False,
-                   plot_save=True)
+                   plot_show=False)
 
         io.array_out(array_name=norm_img,
                      file_name=f'corrected_{file_name}',
