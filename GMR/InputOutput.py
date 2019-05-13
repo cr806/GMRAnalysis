@@ -2,6 +2,52 @@ import os
 import numpy as np
 from shutil import copy
 import pandas as pd
+import GMR.ConfigureSettings as cs
+
+
+def exp_in(dir_name):
+    '''
+    Reads in the experiment settings file outputted from GMRX setup detailing
+    the number of images, integration time, initial/final wavelength and step,
+    time step and image numbers.
+    Args:
+        dir_name: <string> directory containing experiment settings document
+    Returns:
+        an array containing each line of the experiment settings document
+    '''
+
+    exp_settings = {
+        'int_time' : 0.0,
+        'slit' : 0.0,
+        'wav_i' : 0.0,
+        'wav_f' : 0.0,
+        'wav_s' : 0.0,
+        'time_s' : 0,
+        'hs_imgs': []
+    }
+
+    with open(os.path.join(dir_name, 'experiment_settings.txt'), 'r') as exp:
+        lines = exp.readlines()
+
+    for line in lines:
+        if not line.strip():
+            continue
+        if 'integration time' in line.lower():
+            exp_settings['int_time'] = float(line.split(':')[1].strip())
+        if 'slit widths' in line.lower():
+            exp_settings['slit'] = int(line.split(':')[1].strip())
+        if 'initial wavelength' in line.lower():
+            exp_settings['wav_i'] = float(line.split(':')[1].strip())
+        if 'final wavelength' in line.lower():
+            exp_settings['wav_f'] = float(line.split(':')[1].strip())
+        if 'wavelength step' in line.lower():
+            exp_settings['wav_s'] = float(line.split(':')[1].strip())
+        #if 'time step' in line.lower():
+        #    exp_settings['time_s'] = int(line.split(':')[1].strip())
+        if 'hs_img_' in line.lower():
+            exp_settings['hs_imgs'].append(line.split('\t')[0].strip())
+
+    return exp_settings
 
 
 def check_dir_exists(dir_name):
@@ -46,6 +92,7 @@ def exp_in():
     print('Data set(s) to be examined:')
     print(os.listdir(main_dir))
     print('\n')
+    
     return main_dir
 
 
@@ -67,10 +114,11 @@ def extract_files(dir_name, file_string):
         file_string: <string> string contained within desired files
     '''
     dir_list = file_sort(dir_name)
+    
     return [a for a in dir_list if file_string in a]
 
 
-def filename(file_path):
+def get_filename(file_path):
     '''
     Takes a file name path and splits on '/' to obtain only the file name.
     Splits the file name from extension and returns just the user asigned
@@ -78,7 +126,8 @@ def filename(file_path):
     Args:
         file_name: <string> path to file
     '''
-    return os.path.splitext(os.path.basename(file_name))[0]
+
+    return os.path.splitext(os.path.basename(file_path))[0]
 
 
 def raw_in(file_path):
@@ -90,9 +139,10 @@ def raw_in(file_path):
     Args:
         file_name: <string> file path
     '''
-    file_name = filename(file_path)
-    img = pd.read_csv(file_name, sep='\t')
+    file_name = get_filename(file_path)
+    img = pd.read_csv(file_path, sep=',')
     img = img.values
+    
     return img, file_name
 
 
@@ -108,9 +158,8 @@ def data_array_out(array_name, file_name, dir_name):
         file_name: <string> file name to save out
         dir_name: <string> directory name to copy saved array to
     '''
-    check_dir_exists(dir_name)
-
-    file_name = f'(file_name).npy'
+    cs.check_dir_exists(dir_name)
+    file_name = f'{file_name}.npy'
     np.save(file_name, array_name)
     copy(file_name, dir_name)
     os.remove(file_name)

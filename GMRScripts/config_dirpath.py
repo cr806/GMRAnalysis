@@ -22,7 +22,8 @@ def ConfigDirPath():
         print('Place test data into "Put_Data_Here" folder with this code.')
         print('This is the same folder created on GMR X.')
         print('Once complete please hit enter on your keyboard.')
-        os.sys.exit(0)
+        input('Press enter to continue...\n')
+        #os.sys.exit(0)
     else:
         print('Data present in "Put_Data_Here", ensure it is correct\n')
         input('Press enter to continue...\n')
@@ -39,7 +40,7 @@ if __name__ == '__main__':
 
     for d in data_files:
         img_dir = os.path.join(main_dir, d)
-        if not os.path.isdir(img_dir):
-            continue
+        #if not os.path.isdir(img_dir):
+            #continue
         print(img_dir)
         print(os.listdir(img_dir))

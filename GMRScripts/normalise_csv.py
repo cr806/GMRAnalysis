@@ -6,15 +6,15 @@ import GMRScripts.organisation_functions as org
 from shutil import copy
 
 
-def ReadInPwr(file_name):
+def ReadInPwr(dir_name):
     '''
     Read in and process the power spectrum data file
     Args:
         file_name, string file path
     '''
-    pwr_spec = os.path.join(file_name, 'power_spectrum.csv')
+    pwr_spec = os.path.join(dir_name, 'power_spectrum.csv')
     step, wl, f, power = np.genfromtxt(pwr_spec,
-                                       delimiter=',',
+                                       delimiter='\t',
                                        skip_header=1,
                                        unpack=True)
     max_element = np.amax(power)
@@ -81,7 +81,7 @@ def PlotCorrectedImage(file_name,
     Plot a raw image and corrected image (calculate brightness
     values from pixels mean/std) save corrected image out
     '''
-    corrected_img_dir = img_dir
+    corrected_img_dir = os.path.join(img_dir, 'corrected_imgs')
     corrected_img_dir_pngs = f'{corrected_img_dir}_pngs'
 
     file, img_no = Filename(file_name).split('_')
