@@ -243,8 +243,7 @@ def png_out(image_data,
             dir_name,
             image_title,
             out_name,
-            plot_show=False,
-            plot_save=False):
+            plot_show=False):
     '''
     Save array as png image at file name in a given directory
     Args:
@@ -267,16 +266,12 @@ def png_out(image_data,
 
     fig.tight_layout()
 
-    if plot_show or plot_save:
+    if plot_show:
+        plt.show()
 
-        if plot_show:
-            plt.show()
-
-        if plot_save:
-
-            out_dir = os.path.join(dir_name, 'corrected_imgs_pngs')
-            out_path = os.path.join(out_dir, out_name)
-            plt.savefig(out_path)
+    out_dir = os.path.join(dir_name, 'corrected_imgs_pngs')
+    out_path = os.path.join(out_dir, out_name)
+    plt.savefig(out_path)
 
     fig.clf()
     plt.close(fig)
