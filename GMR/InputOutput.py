@@ -1,19 +1,8 @@
 import os
-import numpy as np
-from shutil import copy
-import pandas as pd
-import GMR.ConfigureSettings as cs
 import sys
-
-
-def check_dir_exists(dir_name):
-    '''
-    Check to see if a directory path exists, if not create one.
-    Args:
-        dir_name: <string> directory path
-    '''
-    if os.path.isdir(dir_name) is False:
-        os.mkdir(dir_name)
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
 
 
 def config_dir_path():
@@ -66,38 +55,14 @@ def create_all_dirs(dir_name):
         check_dir_exists(new_png_dir)
 
 
-def update_progress(progress):
+def check_dir_exists(dir_name):
     '''
-    Function to display to terminal or update a progress bar according to
-    value passed.
+    Check to see if a directory path exists, if not create one.
     Args:
-        progress: <float> between 0 and 1. Any int will be converted
-                  to a float. Values less than 0 represent a 'Halt'.
-                  Values greater than or equal to 1 represent 100%
+        dir_name: <string> directory path
     '''
-    barLength = 50  # Modify this to change the length of the progress bar
-    status = " "
-
-    if isinstance(progress, int):
-        progress = float(progress)
-
-    if not isinstance(progress, float):
-        progress = 0
-        status = 'Error: progress input must be float\r\n'
-
-    if progress < 0:
-        progress = 0
-        status = 'Halt...\r\n'
-
-    if progress >= 1:
-        progress = 1
-        status = 'Done...\r\n'
-
-    block = int(round(barLength * progress))
-    progress_str = '#' * block + '-' * (barLength - block)
-    text = f'\rPercent: [{progress_str}] {(progress * 100):.0f}% {status}'
-    sys.stdout.write(text)
-    sys.stdout.flush()
+    if os.path.isdir(dir_name) is False:
+        os.mkdir(dir_name)
 
 
 def exp_in(dir_name):
@@ -145,6 +110,57 @@ def exp_in(dir_name):
     return exp_settings
 
 
+def get_pwr_spectrum(dir_name,
+                     plot_show=False,
+                     plot_save=False):
+    '''
+    Read in and process the power spectrum data file
+    Args:
+        dir_name: <string> directory path to power spectrum
+        plot_show: <bool> if true power spectrum shows
+        plot_save: <bool> if true power spectrum is saved
+    '''
+    power_spectrum = os.path.join(dir_name, 'power_spectrum.csv')
+    step, wl, f, power = np.genfromtxt(power_spectrum,
+                                       delimiter='\t',
+                                       skip_header=1,
+                                       unpack=True)
+    max_element = np.amax(power)
+    norm_power = power / max_element
+
+    if plot_show or plot_save:
+
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=[10, 7])
+
+        ax1.plot(wl, power, 'b', lw=2, label='Power Spectrum')
+        ax1.grid(True)
+        ax1.legend(frameon=True, loc=0, ncol=1, prop={'size': 10})
+        ax1.set_xlabel("Wavelength [nm]", fontsize=14)
+        ax1.set_ylabel("Power [au]", fontsize=14)
+        ax1.set_title("Power Spectrum", fontsize=18)
+
+        ax2.plot(wl, power/norm_power, 'r', lw=2,
+                 label='Corrected Power Spectrum')
+        ax2.grid(True)
+        ax2.legend(frameon=True, loc=0, ncol=1, prop={'size': 10})
+        ax2.set_xlabel("Wavelength [nm]", fontsize=14)
+        ax2.set_ylabel("Corrected Power [au]", fontsize=14)
+        ax2.set_title("Corrected Power Spectrum", fontsize=18)
+
+        fig.tight_layout()
+        if plot_show:
+            plt.show()
+        if plot_save:
+            out_name = 'Corrected_Power_Spectrum.png'
+            out_path = os.path.join(dir_name, out_name)
+            plt.savefig(out_path)
+
+        fig.clf()
+        plt.close(fig)
+
+    return step, wl, f, power, norm_power
+
+
 def file_sort(dir_name):
     '''
     Numerically sort a directory containing a combination of string file names
@@ -174,10 +190,11 @@ def get_filename(file_path):
     Args:
         file_name: <string> path to file
     '''
+
     return os.path.splitext(os.path.basename(file_path))[0]
 
 
-def raw_in(file_path):
+def csv_in(file_path):
     '''
     Reads in raw csv img file using pandas, with a delimiter (sep). Also
     utilises filename function to determine a file_name, this is
@@ -205,7 +222,7 @@ def array_in(file_path, mode):
     return corrected_img, file_name
 
 
-def data_array_out(array_name, file_name, dir_name):
+def array_out(array_name, file_name, dir_name):
     '''
     Save array as file name in a given directory
     Args:
@@ -213,21 +230,102 @@ def data_array_out(array_name, file_name, dir_name):
         file_name: <string> file name to save out
         dir_name: <string> directory name to copy saved array to
     '''
-    cs.check_dir_exists(dir_name)
+    check_dir_exists(dir_name)
 
     file_name = f'{file_name}.npy'
-    np.save(file_name, array_name)
-    copy(file_name, dir_name)
-    os.remove(file_name)
+    file_path = os.path.join(dir_name, file_name)
+
+    np.save(file_path, array_name)
 
 
-def png_out():
-    pass
+def png_out(image_data,
+            file_name,
+            dir_name,
+            image_title,
+            out_name,
+            plot_show=False,
+            plot_save=False):
+    '''
+    Save array as png image at file name in a given directory
+    Args:
+        array_name: <array> python array to save
+        file_name: <string> file name to save out
+        dir_name: <string> directory name to copy saved array to
+    '''
+    img_vmax = np.mean(image_data) + (1 * np.std(image_data))
+    img_vmin = np.mean(image_data) - (1 * np.std(image_data))
+
+    fig, ax1 = plt.subplots(1, 1)
+
+    ax1.imshow(image_data,
+               cmap=plt.cm.cool,
+               origin='lower',
+               vmax=img_vmax,
+               vmin=img_vmin,
+               aspect='equal')
+    ax1.set_title(image_title, fontsize=16)
+
+    fig.tight_layout()
+
+    if plot_show or plot_save:
+
+        if plot_show:
+            plt.show()
+
+        if plot_save:
+
+            out_dir = os.path.join(dir_name, 'corrected_imgs_pngs')
+            out_path = os.path.join(out_dir, out_name)
+            plt.savefig(out_path)
+
+    fig.clf()
+    plt.close(fig)
 
 
 def csv_out():
+    '''
+    Save array as human-readable CSV file at file name in a given directory
+    Args:
+        array_name: <array> python array to save
+        file_name: <string> file name to save out
+        dir_name: <string> directory name to copy saved array to
+    '''
     pass
 
 
 def user_in():
     pass
+
+
+def update_progress(progress):
+    '''
+    Function to display to terminal or update a progress bar according to
+    value passed.
+    Args:
+        progress: <float> between 0 and 1. Any int will be converted
+                  to a float. Values less than 0 represent a 'Halt'.
+                  Values greater than or equal to 1 represent 100%
+    '''
+    barLength = 50  # Modify this to change the length of the progress bar
+    status = " "
+
+    if isinstance(progress, int):
+        progress = float(progress)
+
+    if not isinstance(progress, float):
+        progress = 0
+        status = 'Error: progress input must be float\r\n'
+
+    if progress < 0:
+        progress = 0
+        status = 'Halt...\r\n'
+
+    if progress >= 1:
+        progress = 1
+        status = 'Done...\r\n'
+
+    block = int(round(barLength * progress))
+    progress_str = '#' * block + '-' * (barLength - block)
+    text = f'\rPercent: [{progress_str}] {(progress * 100):.0f}% {status}'
+    sys.stdout.write(text)
+    sys.stdout.flush()

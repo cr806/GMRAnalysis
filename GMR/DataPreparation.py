@@ -3,71 +3,45 @@ import numpy as np
 import matplotlib.pyplot as plt
 from shutil import copy
 
-def pwr_norm(dir_name,
-             plot_show=False,
-             plot_save=False):
+def pwr_norm(image_data, file_name, norm_power, dir_name):
     '''
-    Read in and process the power spectrum data file
+    Plot a raw image and normalised image - use power meter data to
+    normalise images.  Normalised image's brightness estimated from
+    pixels mean/std.  Optionally save corrected image out. Read data
+    values in using Pandas for speed.
     Args:
-        dir_name: <string> directory path to power spectrum
-        plot_show: <bool> if true power spectrum shows
-        plot_save: <bool> if true power spectrum is saved
+        image_data: <array> csv image data as 2D array
+        file_name: <string> file name without extension
+        norm_power: <array> normalised power array
+        dir_name: <string> directory path to concatenate corrected
+                  image png directory to
+    Returns:
+        norm_img: <array> normalised image as numpy array int16
     '''
-    power_spectrum = os.path.join(dir_name, 'power_spectrum.csv')
-    step, wl, f, power = np.genfromtxt(power_spectrum,
-                                       delimiter='\t',
-                                       skip_header=1,
-                                       unpack=True)
-    max_element = np.amax(power)
-    norm_power = power / max_element
+    file, img_no = file_name.split('_')
 
-    if plot_show or plot_save:
+    norm_img = (image_data / norm_power[int(img_no)])
+    norm_img *= 1e3  # increase precision for saving as int
 
-        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=[10,7])
-
-        ax1.plot(wl, power, 'b', lw=2, label='Power Spectrum')
-        ax1.grid(True)
-        ax1.legend(frameon=True, loc=0, ncol=1, prop={'size': 10})
-        ax1.set_xlabel("Wavelength [nm]", fontsize=14)
-        ax1.set_ylabel("Power [au]", fontsize=14)
-        ax1.set_title("Power Spectrum", fontsize=18)
-
-        ax2.plot(wl, power/norm_power, 'r', lw=2,
-                 label='Corrected Power Spectrum')
-        ax2.grid(True)
-        ax2.legend(frameon=True, loc=0, ncol=1, prop={'size': 10})
-        ax2.set_xlabel("Wavelength [nm]", fontsize=14)
-        ax2.set_ylabel("Corrected Power [au]", fontsize=14)
-        ax2.set_title("Corrected Power Spectrum", fontsize=18)
-
-        fig.tight_layout()
-        if plot_show:
-            plt.show()
-        if plot_save:
-            plt.savefig('Corrected_Power_Spectrum.png')
-            copy('Corrected_Power_Spectrum.png', dir_name)
-            os.remove('Corrected_Power_Spectrum.png')
-
-        fig.clf()
-        plt.close(fig)
-
-    return step, wl, f, power, norm_power
+    norm_img = (norm_img).astype('int16')
+    return norm_img
 
 
 def bg_norm(image,
             file_name,
-            norm_power,
+            ROI,
             dir_name,
             plot_show=False,
             plot_save=False):
     '''
-    Plot a raw image and corrected image (calculate brightness values
-    from pixels mean/std) save corrected image out. Read data values
-    in using Pandas.
+    Plot a raw image and normalised image - use the ROI to normalise the
+    rest of the image.  Normalised image's brightness estimated from
+    pixels mean/std.  Optionally save corrected image out. Read data
+    values in using Pandas for speed.
     Args:
         image: <string> path to csv img file
         file_name: <string> file name without extension
-        norm_power: <array> normalised power array
+        ROI: <tuple> x, y coordinates of ROI to use for BG correction
         dir_name: <string> directory path to concatenate corrected
                   image png directory to
         plot_show: <bool> if true raw and corrected image show
@@ -75,61 +49,29 @@ def bg_norm(image,
     Returns:
         norm_img: <array> normalised image as numpy array int16
     '''
-    file, img_no = file_name.split('_')
+    pass
 
-    norm_img = (image / norm_power[int(img_no)])
-    norm_img *= 1e3 # increase precision for saving as int
-
-    img_vmax = np.mean(image) + (1 * np.std(image))
-    img_vmin = np.mean(image) - (1 * np.std(image))
-
-    norm_img_vmax = np.mean(norm_img) + (1 * np.std(norm_img))
-    norm_img_vmin = np.mean(norm_img) - (1 * np.std(norm_img))
-
-    if plot_save or plot_show:
-        fig, (ax1, ax2) = plt.subplots(2, 1)
-
-        ax1.imshow(image,
-                   cmap=plt.cm.cool,
-                   origin='lower',
-                   vmax=img_vmax,
-                   vmin=img_vmin,
-                   aspect='equal')
-        ax1.set_title(f'Image {img_no}', fontsize=16)
-
-        ax2.imshow(norm_img,
-                   cmap=plt.cm.hot,
-                   origin='lower',
-                   vmax=norm_img_vmax,
-                   vmin=norm_img_vmin,
-                   aspect='equal')
-        ax2.set_title(f'Normalised Image {img_no}', fontsize=16)
-
-        fig.tight_layout()
-
-        if plot_show:
-            plt.show()
-
-        if plot_save:
-            out_name = (f'corrected_{file_name}.png')
-            out_dir = os.path.join(dir_name, 'corrected_imgs_pngs')
-            plt.savefig(out_name)
-            copy(out_name, out_dir)
-            os.remove(out_name)
-
-        fig.clf()
-        plt.close(fig)
-
-    norm_img = (norm_img).astype('int16')
-    return norm_img,
 
 def trim_spec():
+    '''
+    Calculate which files correspond to which wavelengths are to be
+    removed.  Moves to new directory (_NOT_PROCESSED) corresonding numpy
+    arrays (or raw csvs).
+    '''
     pass
 
 
 def trim_time():
+    '''
+    Calculate which directories correspond to the times which are not
+    required.  Moves to new directory (_NOT_PROCESSED) unwanted files.
+    '''
     pass
 
 
 def roi():
+    '''
+    Processes numpy arrays to slice out only wanted ROI, then re-saves
+    data for further processing.
+    '''
     pass
