@@ -1,66 +1,12 @@
 import os
+import sys
 import numpy as np
-from shutil import copy
+import matplotlib.pyplot as plt
 import pandas as pd
-import GMR.ConfigureSettings as cs
+from shutil import copy
 
 
-def exp_in(dir_name):
-    '''
-    Reads in the experiment settings file outputted from GMRX setup detailing
-    the number of images, integration time, initial/final wavelength and step,
-    time step and image numbers.
-    Args:
-        dir_name: <string> directory containing experiment settings document
-    Returns:
-        an array containing each line of the experiment settings document
-    '''
-
-    exp_settings = {
-        'int_time' : 0.0,
-        'slit' : 0.0,
-        'wav_i' : 0.0,
-        'wav_f' : 0.0,
-        'wav_s' : 0.0,
-        'time_s' : 0,
-        'hs_imgs': []
-    }
-
-    with open(os.path.join(dir_name, 'experiment_settings.txt'), 'r') as exp:
-        lines = exp.readlines()
-
-    for line in lines:
-        if not line.strip():
-            continue
-        if 'integration time' in line.lower():
-            exp_settings['int_time'] = float(line.split(':')[1].strip())
-        if 'slit widths' in line.lower():
-            exp_settings['slit'] = int(line.split(':')[1].strip())
-        if 'initial wavelength' in line.lower():
-            exp_settings['wav_i'] = float(line.split(':')[1].strip())
-        if 'final wavelength' in line.lower():
-            exp_settings['wav_f'] = float(line.split(':')[1].strip())
-        if 'wavelength step' in line.lower():
-            exp_settings['wav_s'] = float(line.split(':')[1].strip())
-        #if 'time step' in line.lower():
-        #    exp_settings['time_s'] = int(line.split(':')[1].strip())
-        if 'hs_img_' in line.lower():
-            exp_settings['hs_imgs'].append(line.split('\t')[0].strip())
-
-    return exp_settings
-
-
-def check_dir_exists(dir_name):
-    '''
-    Check to see if a directory path exists, if not create one.
-    Args:
-        dir_name: <string> directory path
-    '''
-    if os.path.isdir(dir_name) is False:
-        os.mkdir(dir_name)
-
-
-def exp_in():
+def config_dir_path():
     '''
     Asigns directory path for all data, allowing user input without
     code file path alterations.
@@ -92,8 +38,129 @@ def exp_in():
     print('Data set(s) to be examined:')
     print(os.listdir(main_dir))
     print('\n')
-    
+
     return main_dir
+
+
+def create_all_dirs(dir_name):
+    '''
+    Creates all essential directories required within the code. All sub
+    directories are created within the given dir_name.
+    Args:
+        dir_name: <string) directory path for data
+    '''
+    create_dir_list = ['corrected_imgs']
+    for directory in create_dir_list:
+        new_dir = os.path.join(dir_name, directory)
+        new_png_dir = os.path.join(dir_name, f'{directory}_pngs')
+        check_dir_exists(new_dir)
+        check_dir_exists(new_png_dir)
+
+
+def check_dir_exists(dir_name):
+    '''
+    Check to see if a directory path exists, if not create one.
+    Args:
+        dir_name: <string> directory path
+    '''
+    if os.path.isdir(dir_name) is False:
+        os.mkdir(dir_name)
+
+
+def exp_in(dir_name):
+    '''
+    Reads in the experiment settings file outputted from GMRX setup detailing
+    the number of images, integration time, initial/final wavelength and step,
+    time step and image numbers.
+    Args:
+        dir_name: <string> directory containing experiment settings document
+    Returns:
+        an array containing each line of the experiment settings document
+    '''
+
+    exp_settings = {
+        'int_time': 0.0,
+        'slit': 0.0,
+        'wav_i': 0.0,
+        'wav_f': 0.0,
+        'wav_s': 0.0,
+        'time_s': 0,
+        'hs_imgs': []
+    }
+
+    with open(os.path.join(dir_name, 'experiment_settings.txt'), 'r') as exp:
+        lines = exp.readlines()
+
+    for line in lines:
+        if not line.strip():
+            continue
+        if 'integration time' in line.lower():
+            exp_settings['int_time'] = float(line.split(':')[1].strip())
+        if 'slit widths' in line.lower():
+            exp_settings['slit'] = int(line.split(':')[1].strip())
+        if 'initial wavelength' in line.lower():
+            exp_settings['wav_i'] = float(line.split(':')[1].strip())
+        if 'final wavelength' in line.lower():
+            exp_settings['wav_f'] = float(line.split(':')[1].strip())
+        if 'wavelength step' in line.lower():
+            exp_settings['wav_s'] = float(line.split(':')[1].strip())
+        # if 'time step' in line.lower():
+        #    exp_settings['time_s'] = int(line.split(':')[1].strip())
+        if 'hs_img_' in line.lower():
+            exp_settings['hs_imgs'].append(line.split('\t')[0].strip())
+
+    return exp_settings
+
+
+def get_pwr_spectrum(dir_name,
+                     plot_show=False,
+                     plot_save=False):
+    '''
+    Read in and process the power spectrum data file
+    Args:
+        dir_name: <string> directory path to power spectrum
+        plot_show: <bool> if true power spectrum shows
+        plot_save: <bool> if true power spectrum is saved
+    '''
+    power_spectrum = os.path.join(dir_name, 'power_specrum.csv')
+    step, wl, f, power = np.genfromtxt(power_spectrum,
+                                       delimiter=',',
+                                       skip_header=1,
+                                       unpack=True)
+    max_element = np.amax(power)
+    norm_power = power / max_element
+
+    if plot_show or plot_save:
+
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=[10, 7])
+
+        ax1.plot(wl, power, 'b', lw=2, label='Power Spectrum')
+        ax1.grid(True)
+        ax1.legend(frameon=True, loc=0, ncol=1, prop={'size': 10})
+        ax1.set_xlabel("Wavelength [nm]", fontsize=14)
+        ax1.set_ylabel("Power [au]", fontsize=14)
+        ax1.set_title("Power Spectrum", fontsize=18)
+
+        ax2.plot(wl, power/norm_power, 'r', lw=2,
+                 label='Corrected Power Spectrum')
+        ax2.grid(True)
+        ax2.legend(frameon=True, loc=0, ncol=1, prop={'size': 10})
+        ax2.set_xlabel("Wavelength [nm]", fontsize=14)
+        ax2.set_ylabel("Corrected Power [au]", fontsize=14)
+        ax2.set_title("Corrected Power Spectrum", fontsize=18)
+
+        fig.tight_layout()
+        if plot_show:
+            plt.show()
+        if plot_save:
+            plt.savefig('Corrected_Power_Spectrum.png')
+            copy('Corrected_Power_Spectrum.png', dir_name)
+            os.remove('Corrected_Power_Spectrum.png')
+
+        fig.clf()
+        plt.close(fig)
+
+    return step, wl, f, power, norm_power
 
 
 def file_sort(dir_name):
@@ -114,7 +181,7 @@ def extract_files(dir_name, file_string):
         file_string: <string> string contained within desired files
     '''
     dir_list = file_sort(dir_name)
-    
+
     return [a for a in dir_list if file_string in a]
 
 
@@ -142,11 +209,19 @@ def raw_in(file_path):
     file_name = get_filename(file_path)
     img = pd.read_csv(file_path, sep=',')
     img = img.values
-    
+
     return img, file_name
 
 
-def array_in():
+def array_in(file_name):
+    '''
+    Reads in numpy array. Also utilises filename function to determine a
+    file_name, this is essentially a method of returning a user given (or
+    system given) file name without extension. Returns the array values
+    and the file name.
+    Args:
+        file_name: <string> file path
+    '''
     pass
 
 
@@ -158,7 +233,7 @@ def data_array_out(array_name, file_name, dir_name):
         file_name: <string> file name to save out
         dir_name: <string> directory name to copy saved array to
     '''
-    cs.check_dir_exists(dir_name)
+    check_dir_exists(dir_name)
     file_name = f'{file_name}.npy'
     np.save(file_name, array_name)
     copy(file_name, dir_name)
@@ -166,26 +241,106 @@ def data_array_out(array_name, file_name, dir_name):
 
 
 def png_out():
+    '''
+    Save array as png image at file name in a given directory
+    Args:
+        array_name: <array> python array to save
+        file_name: <string> file name to save out
+        dir_name: <string> directory name to copy saved array to
+    '''
     pass
 
 
 def csv_out():
+    '''
+    Save array as human-readable CSV file at file name in a given directory
+    Args:
+        array_name: <array> python array to save
+        file_name: <string> file name to save out
+        dir_name: <string> directory name to copy saved array to
+    '''
     pass
 
 
-def user_in():
-    pass
+def user_in(choiceDict):
+    '''
+    Requests input from the user, returns user's choice (as int)
+    Returned choice to be used as key to access choice dictionary.
+    Args:
+        user_choice: <dict> python dictionary keys simple ints, values
+                     choice to be made
+    '''
+    while True:
+        os.system('cls' if os.name == 'nt' else 'clear')
+        print('Please choose from the following options, type corresponding'
+              'number and press "Enter"')
+        for k, v in choiceDict.items():
+            print(f'[{k}] : {v}')
+        choice = input('Your choice? ')
+
+        if choice not in str(choiceDict):
+            os.system('cls' if os.name == 'nt' else 'clear')
+            print("Please enter a valid choice")
+            input('Press any key to continue...')
+            continue
+
+        break
+
+    return int(choice)
+
+
+def update_progress(progress):
+    '''
+    Function to display to terminal or update a progress bar according to
+    value passed.
+    Args:
+        progress: <float> between 0 and 1. Any int will be converted
+                  to a float. Values less than 0 represent a 'Halt'.
+                  Values greater than or equal to 1 represent 100%
+    '''
+    barLength = 50  # Modify this to change the length of the progress bar
+    status = " "
+
+    if isinstance(progress, int):
+        progress = float(progress)
+
+    if not isinstance(progress, float):
+        progress = 0
+        status = 'Error: progress input must be float\r\n'
+
+    if progress < 0:
+        progress = 0
+        status = 'Halt...\r\n'
+
+    if progress >= 1:
+        progress = 1
+        status = 'Done...\r\n'
+
+    block = int(round(barLength * progress))
+    progress_str = '#' * block + '-' * (barLength - block)
+    text = f'\rPercent: [{progress_str}] {(progress * 100):.0f}% {status}'
+    sys.stdout.write(text)
+    sys.stdout.flush()
 
 
 if __name__ == '__main__':
-    main_dir = exp_in()
-    hs_imgs = os.listdir(main_dir)
+    # main_dir = exp_in()
+    # hs_imgs = os.listdir(main_dir)
 
-    for hs_img in hs_imgs:
-        img_dir = os.path.join(main_dir, hs_img)
+    # for hs_img in hs_imgs:
+    #     img_dir = os.path.join(main_dir, hs_img)
 
-        if not os.path.isdir(img_dir):
-            continue
+    #     if not os.path.isdir(img_dir):
+    #         continue
 
-        print(img_dir)
-        print(os.listdir(img_dir))
+    #     print(img_dir)
+    #     print(os.listdir(img_dir))
+    while True:
+        d = {
+            1: "Continue",
+            2: "Quit",
+        }
+
+        choice = user_in(d)
+        if choice == 2:
+            sys.exit()
