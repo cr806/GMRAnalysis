@@ -1,11 +1,10 @@
 import os
-import GMR.ConfigureSettings as cs
 import GMR.InputOutput as io
 import GMR.DataPreparation as dp
 import GMRScripts.normalise_csv as ncsv
 import time
 
-main_dir = cs.config_dir_path()
+main_dir = io.config_dir_path()
 
 exp_settings = io.exp_in(main_dir)
 print('Experiment Settings:\n' + f'{exp_settings}' + '\n')
@@ -41,4 +40,4 @@ for hs_img in exp_settings['hs_imgs']:
                           dir_name=os.path.join(img_dir,
                                                 'corrected_imgs'))
 
-        cs.update_progress(index / len(data_files))
+        io.update_progress(index / len(data_files))
