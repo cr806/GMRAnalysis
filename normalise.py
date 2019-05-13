@@ -1,28 +1,56 @@
 import os
-import GMRScripts.organisation_functions as org
-import GMRScripts.normalise_csv as ncsv
-import GMRScripts.config_dirpath as con
+import GMR.InputOutput as io
+import GMR.DataPreparation as dp
 
-main_dir = con.ConfigDirPath()
-data_dirs = os.listdir(main_dir)
+main_dir = io.config_dir_path()
 
-for directory in data_dirs:
-    img_dir = os.path.join(main_dir, directory)
+exp_settings = io.exp_in(main_dir)
+print('Experiment Settings:\n' + f'{exp_settings}' + '\n')
 
-    data_files = org.ExtractFiles(dir_name=img_dir, file_string='img_')
+step, wl, f, power, norm_power = io.get_pwr_spectrum(dir_name=main_dir,
+                                                     plot_show=False,
+                                                     plot_save=True)
 
-    step, wl, f, power, norm_power = ncsv.ReadInPwr(dir_name=img_dir)
+for hs_img in exp_settings['hs_imgs']:
+    img_dir = os.path.join(main_dir, hs_img)
+    if not os.path.isdir(img_dir):
+        continue
 
-    ncsv.PlotDouble(wl, power, norm_power, show=False)
+    io.create_all_dirs(dir_name=img_dir)
 
+    data_files = io.extract_files(dir_name=img_dir,
+                                  file_string='img_')
+
+    print('\nNormalising csvs...')
     for index, file in enumerate(data_files):
-        file_name = os.path.join(img_dir, file)
-        ncsv.PlotCorrectedImage(file_name,
-                                f'corrected_{file[0:-4]}',
-                                img_dir,
-                                norm_power,
-                                save_out=True,
-                                plot_show=False,
-                                plot_save=False)
+        file_path = os.path.join(img_dir, file)
+        img, file_name = io.csv_in(file_path=file_path)
 
-        org.UpdateProgress((index + 1) / len(data_files))
+        _, img_no = file_name.split('_')
+        io.png_out(image_data=img,
+                   file_name=file_name,
+                   dir_name=img_dir,
+                   image_title=f'Image: {img_no}',
+                   out_name=f'{file_name}.png',
+                   plot_show=False,
+                   plot_save=True)
+
+        norm_img = dp.pwr_norm(image_data=img,
+                               file_name=file_name,
+                               norm_power=norm_power,
+                               dir_name=img_dir)
+
+        io.png_out(image_data=norm_img,
+                   file_name=file_name,
+                   dir_name=img_dir,
+                   image_title=f'Normalised image: {img_no}',
+                   out_name=f'corrected_{file_name}.png',
+                   plot_show=False,
+                   plot_save=True)
+
+        io.array_out(array_name=norm_img,
+                     file_name=f'corrected_{file_name}',
+                     dir_name=os.path.join(img_dir,
+                                           'corrected_imgs'))
+
+        io.update_progress(index / len(data_files))
