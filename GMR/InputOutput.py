@@ -197,14 +197,14 @@ def get_filename(file_path):
     return os.path.splitext(os.path.basename(file_path))[0]
 
 
-def raw_in(file_path):
+def csv_in(file_path):
     '''
     Reads in raw csv img file using pandas, with a delimiter (sep). Also
     utilises filename function to determine a file_name, this is
     essentially a method of returning a user given (or system given) file
     name without extension. Returns the img values and the file name.
     Args:
-        file_name: <string> file path
+        file_path: <string> file path
     '''
     file_name = get_filename(file_path)
     img = pd.read_csv(file_path, sep=',')
@@ -225,7 +225,7 @@ def array_in(file_name):
     pass
 
 
-def data_array_out(array_name, file_name, dir_name):
+def array_out(array_name, file_name, dir_name):
     '''
     Save array as file name in a given directory
     Args:
@@ -240,7 +240,7 @@ def data_array_out(array_name, file_name, dir_name):
     os.remove(file_name)
 
 
-def png_out():
+def png_out(image_data, file_name, dir_name, image_title, plot_show=False):
     '''
     Save array as png image at file name in a given directory
     Args:
@@ -248,7 +248,32 @@ def png_out():
         file_name: <string> file name to save out
         dir_name: <string> directory name to copy saved array to
     '''
-    pass
+    img_vmax = np.mean(image_data) + (1 * np.std(image_data))
+    img_vmin = np.mean(image_data) - (1 * np.std(image_data))
+
+    fig, ax1 = plt.subplots(2, 1)
+
+    ax1.imshow(image_data,
+               cmap=plt.cm.cool,
+               origin='lower',
+               vmax=img_vmax,
+               vmin=img_vmin,
+               aspect='equal')
+    ax1.set_title(image_title, fontsize=16)
+
+    fig.tight_layout()
+
+    if plot_show:
+        plt.show()
+
+    out_name = (f'corrected_{file_name}.png')
+    out_dir = os.path.join(dir_name, 'corrected_imgs_pngs')
+    plt.savefig(out_name)
+    copy(out_name, out_dir)
+    os.remove(out_name)
+
+    fig.clf()
+    plt.close(fig)
 
 
 def csv_out():
