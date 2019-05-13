@@ -192,9 +192,9 @@ def get_pwr_spectrum(dir_name,
         if plot_show:
             plt.show()
         if plot_save:
-            plt.savefig('Corrected_Power_Spectrum.png')
-            copy('Corrected_Power_Spectrum.png', dir_name)
-            os.remove('Corrected_Power_Spectrum.png')
+            out_name = 'Corrected_Power_Spectrum.png'
+            out_path = os.path.join(dir_name, out_name)
+            plt.savefig(out_path)
 
         fig.clf()
         plt.close(fig)
@@ -220,7 +220,6 @@ def extract_files(dir_name, file_string):
         file_string: <string> string contained within desired files
     '''
     dir_list = file_sort(dir_name)
-
     return [a for a in dir_list if file_string in a]
 
 
@@ -246,22 +245,23 @@ def csv_in(file_path):
         file_path: <string> file path
     '''
     file_name = get_filename(file_path)
-    img = pd.read_csv(file_path, sep=',')
+    img = pd.read_csv(file_path, sep='\t')
     img = img.values
 
     return img, file_name
 
 
-def array_in(file_name):
+def array_in(file_path, mode):
     '''
-    Reads in numpy array. Also utilises filename function to determine a
-    file_name, this is essentially a method of returning a user given (or
-    system given) file name without extension. Returns the array values
-    and the file name.
+    Loads in numpy array using the mmap_mode specified in args. Also
+    brings in the file name using get_filename function.
     Args:
-        file_name: <string> file path
+        file_path: <string> file path string
+        mode: <mmap_mode> None, 'r+', 'r', 'w+', 'c'
     '''
-    pass
+    corrected_img = np.load(file_path, mmap_mode=mode)
+    file_name = get_filename(file_path)
+    return corrected_img, file_name
 
 
 def array_out(array_name, file_name, dir_name):
@@ -274,12 +274,17 @@ def array_out(array_name, file_name, dir_name):
     '''
     check_dir_exists(dir_name)
     file_name = f'{file_name}.npy'
-    np.save(file_name, array_name)
-    copy(file_name, dir_name)
-    os.remove(file_name)
+    file_path = os.path.join(dir_name, file_name)
+
+    np.save(file_path, array_name)
 
 
-def png_out(image_data, file_name, dir_name, image_title, plot_show=False):
+def png_out(image_data,
+            file_name,
+            dir_name,
+            image_title,
+            out_name,
+            plot_show=False):
     '''
     Save array as png image at file name in a given directory
     Args:
@@ -290,7 +295,7 @@ def png_out(image_data, file_name, dir_name, image_title, plot_show=False):
     img_vmax = np.mean(image_data) + (1 * np.std(image_data))
     img_vmin = np.mean(image_data) - (1 * np.std(image_data))
 
-    fig, ax1 = plt.subplots(2, 1)
+    fig, ax1 = plt.subplots(1, 1)
 
     ax1.imshow(image_data,
                cmap=plt.cm.cool,
@@ -349,8 +354,6 @@ def user_in(choiceDict):
             continue
 
         break
-
-    return int(choice)
 
 
 def update_progress(progress):

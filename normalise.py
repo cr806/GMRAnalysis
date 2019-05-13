@@ -27,16 +27,24 @@ for hs_img in exp_settings['hs_imgs']:
         img, file_name = io.csv_in(file_path=file_path)
 
         _, img_no = file_name.split('_')
-        io.png_out(img, file_name, img_dir,
-                   f'Image: {img_no}', plot_show=True)
+        io.png_out(image_data=img,
+                   file_name=file_name,
+                   dir_name=img_dir,
+                   image_title=f'Image: {img_no}',
+                   out_name=f'{file_name}.png',
+                   plot_show=False)
 
         norm_img = dp.pwr_norm(image_data=img,
                                file_name=file_name,
                                norm_power=norm_power,
                                dir_name=img_dir)
 
-        io.png_out(norm_img, file_name, img_dir,
-                   f'Normalised image: {img_no}', plot_show=True)
+        io.png_out(image_data=norm_img,
+                   file_name=file_name,
+                   dir_name=img_dir,
+                   image_title=f'Normalised image: {img_no}',
+                   out_name=f'corrected_{file_name}.png',
+                   plot_show=False)
 
         io.array_out(array_name=norm_img,
                      file_name=f'corrected_{file_name}',
