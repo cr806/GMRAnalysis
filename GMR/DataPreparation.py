@@ -13,9 +13,9 @@ def pwr_norm(dir_name,
         plot_show: <bool> if true power spectrum shows
         plot_save: <bool> if true power spectrum is saved
     '''
-    power_spectrum = os.path.join(dir_name, 'power_spectrum.csv')
+    power_spectrum = os.path.join(dir_name, 'power_specrum.csv')
     step, wl, f, power = np.genfromtxt(power_spectrum,
-                                       delimiter='\t',
+                                       delimiter=',',
                                        skip_header=1,
                                        unpack=True)
     max_element = np.amax(power)
@@ -121,7 +121,8 @@ def bg_norm(image,
         plt.close(fig)
 
     norm_img = (norm_img).astype('int16')
-    return norm_img,
+    return norm_img
+  
 
 def trim_spec():
     pass
