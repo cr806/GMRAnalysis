@@ -38,7 +38,7 @@ for index, experiment in enumerate(analysis["experiments"]):
         data_files = io.extract_files(dir_name=img_dir,
                                       file_string='img_')
 
-        print('\nNormalising csvs...')
+        print('Normalising data...')
         for index, file in enumerate(data_files):
             file_path = os.path.join(img_dir, file)
             img, file_name = io.csv_in(file_path=file_path)
@@ -74,3 +74,26 @@ for index, experiment in enumerate(analysis["experiments"]):
                                                'corrected_imgs'))
 
             io.update_progress(index / len(data_files))
+
+        print('Analysing data...')
+        print('Performing')
+        if 'max-min' in experiment["normalise"].lower():
+            pass
+        elif 'fsr' in experiment["normalise"].lower():
+            pass
+        elif 'fano' in experiment["normalise"].lower():
+            pass
+        elif 'double fano' in experiment["normalise"].lower():
+            pass
+        elif 'diff fano' in experiment["normalise"].lower():
+            pass
+        elif 'diff double fano' in experiment["normalise"].lower():
+            pass
+
+        # if save_imgs:
+        #     io.png_out(image_data=result,
+        #                file_name=f'{file_name}_result',
+        #                dir_name=img_dir,
+        #                image_title=f'Result: {img_no}',
+        #                out_name=f'{file_name}.png',
+        #                plot_show=False)
