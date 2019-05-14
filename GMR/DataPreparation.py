@@ -74,3 +74,36 @@ def roi():
     data for further processing.
     '''
     pass
+
+
+def reshape_to_spec_lists(hs_data_cube, img_width = 1920, img_height=1080):
+    '''
+    Reshapes a numpy hyperspectral data cube with axes (lambda, x, y)
+    into an array with axes (pixels, lambda) so the spectrum corresponding
+    to each pixel can be iterated.
+    Args:
+        hs_data_cube: 3D numpy array
+        img_width: int, width of image in pixels. Optional
+        img_height: int, height of image in pixels. Optional
+    Returns:
+        spec_list: 2D numpy array
+    '''
+    img_width, img_height = hs_data_cube.shape[1:]
+    num_pixels = img_width*img_height
+    
+    spec_list = np.reshape(hs_data_cube, (num_wavs, num_pixels))
+    spec_list = np.transpose(spectra)
+    return spec_list
+
+def reshape_to_img(spec_list, img_width = 1920, img_height = 1080)
+    '''
+    Args:
+        spec_list: 1D numpy array
+        img_width: int, width of image in pixels. Optional
+        img_height: int, height of image in pixels. Optional
+    Returns:
+        img_array: 2D numpy array
+    '''
+    img_array = np.reshape(spec_list, (img_width, img_height))
+    img_array = np.transpose(img_array)
+    return img_array
