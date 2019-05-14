@@ -71,6 +71,6 @@ for index, experiment in enumerate(analysis["experiments"]):
             io.array_out(array_name=norm_img,
                          file_name=f'corrected_{file_name}',
                          dir_name=os.path.join(img_dir,
-                         'corrected_imgs'))
+                                               'corrected_imgs'))
 
             io.update_progress(index / len(data_files))
