@@ -3,9 +3,8 @@ import GMR.InputOutput as io
 
 main_dir = io.config_dir_path()
 
-
 exp_settings = io.exp_in(main_dir)
-print('Experiment Settings:\n' + f'{exp_settings}' + '\n')
+print(f'Experiment Settings:\n {exp_settings}\n')
 
 for hs_img in exp_settings['hs_imgs']:
     img_dir = os.path.join(main_dir, hs_img)
@@ -20,10 +19,8 @@ for hs_img in exp_settings['hs_imgs']:
 
     print('\nBuilding data cube...')
     for index, file in enumerate(data_files):
-        file_path = os.path.join(corrected_img_dir,
-                                 file)
-        corrected_img, file_name = io.array_in(file_path,
-                                               mode='r')
+        file_path = os.path.join(corrected_img_dir, file)
+        corrected_img, file_name = io.array_in(file_path, mode='r')
         data_cube.append(corrected_img)
 
         io.update_progress(index / len(data_files))
