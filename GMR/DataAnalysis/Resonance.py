@@ -16,7 +16,7 @@ def find_min_wl(spec_list, wl):
     return min_wl
 
     
-def find_max_wl():
+def find_max_wl(spec_list, wl):
     '''
     Finds the maximum wavelength for each spectrum in a list of spectra
     Args:
