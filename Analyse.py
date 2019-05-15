@@ -1,4 +1,5 @@
 import os
+import sys
 import numpy as np
 from pprint import pprint
 import GMR.InputOutput as io
@@ -6,7 +7,12 @@ import GMR.DataPreparation as dp
 
 
 root = '/Users/chris/Documents/SoftwareDev/Python/GMR Analysis Project/TEST'
-analysis = io.analysis_in_json(root)
+try:
+    analysis = io.analysis_in_json(root)
+except Exception:
+    print('Something wrong with Analysis config file, please check and'
+          'execute code again.')
+    sys.exit()
 
 for index, experiment in enumerate(analysis["experiments"]):
     print(f'Experiment {index + 1} out of {len(analysis["experiments"])}')
@@ -18,7 +24,14 @@ for index, experiment in enumerate(analysis["experiments"]):
     else:
         main_dir = io.config_dir_path()
 
-    exp_settings = io.exp_in_json(main_dir)
+    try:
+        exp_settings = io.exp_in_json(main_dir)
+    except Exception:
+        print(f'Something wrong with experimental settings in'
+              f'{experiment["dir_name"]} config file, please check and'
+              f'execute code again.')
+        sys.exit()
+
     print(f'Experiment Settings:')
     pprint(exp_settings)
     print('=' * 40)
