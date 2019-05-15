@@ -88,14 +88,14 @@ def reshape_to_spec_lists(hs_data_cube, img_width = 1920, img_height=1080):
     Returns:
         spec_list: 2D numpy array
     '''
-    img_width, img_height = hs_data_cube.shape[1:]
+    num_wavs, img_width, img_height = hs_data_cube.shape
     num_pixels = img_width*img_height
-    
+
     spec_list = np.reshape(hs_data_cube, (num_wavs, num_pixels))
-    spec_list = np.transpose(spectra)
+    spec_list = np.transpose(spec_list)
     return spec_list
 
-def reshape_to_img(spec_list, img_width = 1920, img_height = 1080)
+def reshape_to_img(spec_list, img_width = 1920, img_height = 1080):
     '''
     Args:
         spec_list: 1D numpy array
