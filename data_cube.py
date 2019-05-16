@@ -3,7 +3,6 @@ import GMR.InputOutput as io
 
 main_dir = io.config_dir_path()
 
-
 exp_settings = io.exp_in(main_dir)
 print('Experiment Settings:\n' + f'{exp_settings}' + '\n')
 
@@ -15,6 +14,7 @@ for hs_img in exp_settings['hs_imgs']:
 
     data_files = io.extract_files(dir_name=corrected_img_dir,
                                   file_string='corrected_img_')
+    print(len(data_files))
 
     data_cube = []
 
@@ -31,4 +31,4 @@ for hs_img in exp_settings['hs_imgs']:
     print('\nSaving data cube...approximately 1min per 100 imgs')
     io.array_out(array_name=data_cube,
                  file_name=f'{hs_img}_datacube',
-                 dir_name=img_dir)
+                 dir_name=main_dir)
