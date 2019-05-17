@@ -1,6 +1,5 @@
 import os
 import numpy as np
-import matplotlib.pyplot as plt
 import GMR.InputOutput as io
 
 
@@ -143,7 +142,7 @@ def processing_parameters(main_dir,
     print(f'Total processing time: ~{process_time} mins')
 
 
-def reshape_to_spec_lists(hs_data_cube, img_width = 1920, img_height=1080):
+def reshape_to_spec_lists(hs_data_cube, img_width=1920, img_height=1080):
     '''
     Reshapes a numpy hyperspectral data cube with axes (lambda, x, y)
     into an array with axes (pixels, lambda) so the spectrum corresponding
@@ -163,7 +162,7 @@ def reshape_to_spec_lists(hs_data_cube, img_width = 1920, img_height=1080):
     return spec_list
 
 
-def reshape_to_img(spec_list, img_width = 1920, img_height = 1080):
+def reshape_to_img(spec_list, img_width=1920, img_height=1080):
     '''
     Args:
         spec_list: 1D numpy array
