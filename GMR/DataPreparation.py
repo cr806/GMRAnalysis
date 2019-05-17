@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import GMR.InputOutput as io
 
+
 def pwr_norm(image_data, file_name, norm_power, dir_name):
     '''
     Plot a raw image and normalised image - use power meter data to
@@ -160,6 +161,7 @@ def reshape_to_spec_lists(hs_data_cube, img_width = 1920, img_height=1080):
     spec_list = np.reshape(hs_data_cube, (num_wavs, num_pixels))
     spec_list = np.transpose(spec_list)
     return spec_list
+
 
 def reshape_to_img(spec_list, img_width = 1920, img_height = 1080):
     '''

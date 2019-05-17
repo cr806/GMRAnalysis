@@ -115,12 +115,12 @@ def exp_in(dir_name):
     '''
 
     exp_settings = {
-        'int_time' : 0.0,
-        'slit' : 0.0,
-        'wav_i' : 0.0,
-        'wav_f' : 0.0,
-        'wav_s' : 0.0,
-        'time_s' : 0,
+        'int_time': 0.0,
+        'slit': 0.0,
+        'wav_i': 0.0,
+        'wav_f': 0.0,
+        'wav_s': 0.0,
+        'time_s': 0,
         'hs_imgs': []
     }
 
@@ -140,7 +140,7 @@ def exp_in(dir_name):
             exp_settings['wav_f'] = float(line.split(':')[1].strip())
         if 'wavelength step' in line.lower():
             exp_settings['wav_s'] = float(line.split(':')[1].strip())
-        #if 'time step' in line.lower():
+        # if 'time step' in line.lower():
         #    exp_settings['time_s'] = int(line.split(':')[1].strip())
         if 'hs_img_' in line.lower():
             exp_settings['hs_imgs'].append(line.split('\t')[0].strip())
@@ -326,8 +326,31 @@ def csv_out():
     pass
 
 
-def user_in():
-    pass
+def user_in(choiceDict):
+    '''
+            Requests input from the user, returns user's choice (as int)
+            Returned choice to be used as key to access choice dictionary.
+            Args:
+                user_choice: <dict> python dictionary keys simple ints, values
+                             choice to be made
+            '''
+    while True:
+        os.system('cls' if os.name == 'nt' else 'clear')
+        print('Please choose from the following options, type corresponding'
+              'number and press "Enter"')
+        for k, v in choiceDict.items():
+            print(f'[{k}] : {v}')
+        choice = input('Your choice? ')
+
+        if choice not in str(choiceDict):
+            os.system('cls' if os.name == 'nt' else 'clear')
+            print("Please enter a valid choice")
+            input('Press any key to continue...')
+            continue
+
+        break
+
+    return int(choice)
 
 
 def update_progress(progress):
