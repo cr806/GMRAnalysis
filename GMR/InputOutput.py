@@ -5,6 +5,44 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 
+def analysis_in_json(dir_name):
+    '''
+    Reads in the analysis settings file configured by the user including
+    the number of experiments to be analysed, where the data is located
+    for each experiment, what normalisation and analysis is required for
+    each experiment, whether images should be saved to disk and where data
+    should be saved.
+    Args:
+        dir_name: <string> directory containing experiment settings document
+    Returns:
+        a dictionary containing each analysis setting
+    Example JSON:
+        {
+            "experiments": [
+                {
+                    "dir_name": "Test1",
+                    "root_path": "/Users/chris/Documents/Python/Put_Data_Here",
+                    "analysis": "FSR",
+                    "normalise": "Power Meter",
+                    "save_imgs": "False",
+                    "save_path": "/Users/chris/Documents/Python/Put_Data_Here"
+                },
+                {
+                    "dir_name": "Test2",
+                    "root_path": "/Volumes/krauss/GMR X user files/Chris",
+                    "analysis": "Max-Min",
+                    "normalise": "BG",
+                    "save_imgs": "True",
+                    "save_path": "/Volumes/krauss/GMR X user files/Chris"
+                }
+            ]
+        }
+    '''
+    filename = os.path.join(dir_name, 'analysis_settings.config')
+    with open(filename, 'r') as f:
+        return json.load(f)
+
+
 def config_dir_path():
     '''
     Asigns directory path for all data, allowing user input without
