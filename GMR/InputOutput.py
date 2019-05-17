@@ -329,12 +329,12 @@ def csv_out():
 
 def user_in(choiceDict):
     '''
-            Requests input from the user, returns user's choice (as int)
-            Returned choice to be used as key to access choice dictionary.
-            Args:
-                user_choice: <dict> python dictionary keys simple ints, values
-                             choice to be made
-            '''
+    Requests input from the user, returns user's choice (as int)
+    Returned choice to be used as key to access choice dictionary.
+    Args:
+        user_choice: <dict> python dictionary keys simple ints, values
+                     choice to be made
+    '''
     while True:
         os.system('cls' if os.name == 'nt' else 'clear')
         print('Please choose from the following options, type corresponding'
