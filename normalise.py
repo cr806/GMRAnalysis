@@ -2,10 +2,18 @@ import os
 import GMR.InputOutput as io
 import GMR.DataPreparation as dp
 
+import time
+
 main_dir = io.config_dir_path()
+
+start = time.time()
 
 exp_settings = io.exp_in(main_dir)
 print('Experiment Settings:\n' + f'{exp_settings}' + '\n')
+
+dp.processing_parameters(main_dir=main_dir,
+                         exp_settings=exp_settings,
+                         image_save=False)
 
 step, wl, f, power, norm_power = io.get_pwr_spectrum(dir_name=main_dir,
                                                      plot_show=False,
@@ -20,6 +28,7 @@ for hs_img in exp_settings['hs_imgs']:
 
     data_files = io.extract_files(dir_name=img_dir,
                                   file_string='img_')
+    print(len(data_files))
 
     print('\nNormalising csvs...')
     for index, file in enumerate(data_files):
@@ -46,10 +55,13 @@ for hs_img in exp_settings['hs_imgs']:
                    out_name=f'corrected_{file_name}.png',
                    plot_show=False)
 
-
         io.array_out(array_name=norm_img,
                      file_name=f'corrected_{file_name}',
                      dir_name=os.path.join(img_dir,
                                            'corrected_imgs'))
 
         io.update_progress(index / len(data_files))
+
+end = time.time()
+
+print(end-start)

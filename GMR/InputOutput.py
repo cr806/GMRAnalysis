@@ -1,10 +1,8 @@
 import os
 import sys
-import json
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-from shutil import copy
 
 
 def analysis_in_json(dir_name):
@@ -77,7 +75,6 @@ def config_dir_path():
     print('Data set(s) to be examined:')
     print(os.listdir(main_dir))
     print('\n')
-
     return main_dir
 
 
@@ -106,43 +103,6 @@ def check_dir_exists(dir_name):
         os.mkdir(dir_name)
 
 
-def exp_in_json(dir_name):
-    '''
-    Reads in the experiment settings file outputted from GMRX setup detailing
-    the number of images, integration time, initial/final wavelength and step,
-    time step and image numbers.
-    Args:
-        dir_name: <string> directory containing experiment settings document
-    Returns:
-        a dictionary containing each setting
-    Example JSON:
-        {
-            "hs_images": 1,
-            "integration_time": 500.0,
-            "slit_widths": 1000,
-            "initial_wavelength": 700.0,
-            "final_wavelength": 800.0,
-            "wavelength_step": 0.5,
-            "time_step": 0,
-            "files": [
-                {
-                    "filename": "hs_img_000",
-                    "date": "29/04/2019",
-                    "time": "11:48:57"
-                },
-                {
-                    "filename": "hs_img_001",
-                    "date": "29/04/2019",
-                    "time": "11:50:24"
-                }
-            ]
-        }
-    '''
-    filename = os.path.join(dir_name, 'experiment_settings.config')
-    with open(filename, 'r') as f:
-        return json.load(f)
-
-
 def exp_in(dir_name):
     '''
     Reads in the experiment settings file outputted from GMRX setup detailing
@@ -151,21 +111,20 @@ def exp_in(dir_name):
     Args:
         dir_name: <string> directory containing experiment settings document
     Returns:
-        a dictionary containing each setting
+        an array containing each line of the experiment settings document
     '''
 
     exp_settings = {
-        'int_time': 0.0,
-        'slit': 0.0,
-        'wav_i': 0.0,
-        'wav_f': 0.0,
-        'wav_s': 0.0,
-        'time_s': 0,
+        'int_time' : 0.0,
+        'slit' : 0.0,
+        'wav_i' : 0.0,
+        'wav_f' : 0.0,
+        'wav_s' : 0.0,
+        'time_s' : 0,
         'hs_imgs': []
     }
 
-    filename = os.path.join(dir_name, 'experiment_settings.txt')
-    with open(filename, 'r') as exp:
+    with open(os.path.join(dir_name, 'experiment_settings.txt'), 'r') as exp:
         lines = exp.readlines()
 
     for line in lines:
@@ -181,7 +140,7 @@ def exp_in(dir_name):
             exp_settings['wav_f'] = float(line.split(':')[1].strip())
         if 'wavelength step' in line.lower():
             exp_settings['wav_s'] = float(line.split(':')[1].strip())
-        # if 'time step' in line.lower():
+        #if 'time step' in line.lower():
         #    exp_settings['time_s'] = int(line.split(':')[1].strip())
         if 'hs_img_' in line.lower():
             exp_settings['hs_imgs'].append(line.split('\t')[0].strip())
@@ -201,7 +160,7 @@ def get_pwr_spectrum(dir_name,
     '''
     power_spectrum = os.path.join(dir_name, 'power_spectrum.csv')
     step, wl, f, power = np.genfromtxt(power_spectrum,
-                                       delimiter=',',
+                                       delimiter='\t',
                                        skip_header=1,
                                        unpack=True)
     max_element = np.amax(power)
@@ -280,12 +239,11 @@ def csv_in(file_path):
     essentially a method of returning a user given (or system given) file
     name without extension. Returns the img values and the file name.
     Args:
-        file_path: <string> file path
+        file_name: <string> file path
     '''
     file_name = get_filename(file_path)
     img = pd.read_csv(file_path, sep='\t')
     img = img.values
-
     return img, file_name
 
 
@@ -311,6 +269,7 @@ def array_out(array_name, file_name, dir_name):
         dir_name: <string> directory name to copy saved array to
     '''
     check_dir_exists(dir_name)
+
     file_name = f'{file_name}.npy'
     file_path = os.path.join(dir_name, file_name)
 
@@ -348,11 +307,9 @@ def png_out(image_data,
     if plot_show:
         plt.show()
 
-    out_name = (f'corrected_{file_name}.png')
     out_dir = os.path.join(dir_name, 'corrected_imgs_pngs')
-    plt.savefig(out_name)
-    copy(out_name, out_dir)
-    os.remove(out_name)
+    out_path = os.path.join(out_dir, out_name)
+    plt.savefig(out_path)
 
     fig.clf()
     plt.close(fig)
@@ -369,29 +326,8 @@ def csv_out():
     pass
 
 
-def user_in(choiceDict):
-    '''
-    Requests input from the user, returns user's choice (as int)
-    Returned choice to be used as key to access choice dictionary.
-    Args:
-        user_choice: <dict> python dictionary keys simple ints, values
-                     choice to be made
-    '''
-    while True:
-        os.system('cls' if os.name == 'nt' else 'clear')
-        print('Please choose from the following options, type corresponding'
-              'number and press "Enter"')
-        for k, v in choiceDict.items():
-            print(f'[{k}] : {v}')
-        choice = input('Your choice? ')
-
-        if choice not in str(choiceDict):
-            os.system('cls' if os.name == 'nt' else 'clear')
-            print("Please enter a valid choice")
-            input('Press any key to continue...')
-            continue
-
-        break
+def user_in():
+    pass
 
 
 def update_progress(progress):
@@ -426,26 +362,3 @@ def update_progress(progress):
     text = f'\rPercent: [{progress_str}] {(progress * 100):.0f}% {status}'
     sys.stdout.write(text)
     sys.stdout.flush()
-
-
-if __name__ == '__main__':
-    # main_dir = exp_in()
-    # hs_imgs = os.listdir(main_dir)
-
-    # for hs_img in hs_imgs:
-    #     img_dir = os.path.join(main_dir, hs_img)
-
-    #     if not os.path.isdir(img_dir):
-    #         continue
-
-    #     print(img_dir)
-    #     print(os.listdir(img_dir))
-    while True:
-        d = {
-            1: "Continue",
-            2: "Quit",
-        }
-
-        choice = user_in(d)
-        if choice == 2:
-            sys.exit()
