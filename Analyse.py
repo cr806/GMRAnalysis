@@ -36,15 +36,20 @@ for index, experiment in enumerate(analysis["experiments"]):
     pprint(exp_settings)
     print('=' * 40)
 
+    dp.processing_parameters(main_dir=main_dir,
+                             exp_settings=exp_settings,
+                             image_save=False)
+
     save_imgs = True if 'True' in experiment["save_imgs"] else False
-    step, wl, f, power, norm_power = io.get_pwr_spectrum(dir_name=main_dir,
-                                                         plot_show=False,
-                                                         plot_save=save_imgs)
 
     for hs_img in exp_settings['hs_imgs']:
         img_dir = os.path.join(main_dir, hs_img)
         if not os.path.isdir(img_dir):
             continue
+
+        step, wl, f, power, norm_power = io.get_pwr_spectrum(dir_name=main_dir,
+                                                             plot_show=False,
+                                                             plot_save=save_imgs)
 
         io.create_all_dirs(dir_name=img_dir)
 

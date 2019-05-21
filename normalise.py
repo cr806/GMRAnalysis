@@ -6,7 +6,7 @@ import GMR.DataPreparation as dp
 main_dir = io.config_dir_path()
 
 exp_settings = io.exp_in(main_dir)
-print('Experiment Settings:\n' + f'{exp_settings}' + '\n')
+print(f'Experiment Settings:\n{exp_settings}\n')
 
 dp.processing_parameters(main_dir=main_dir,
                          exp_settings=exp_settings,
